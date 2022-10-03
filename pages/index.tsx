@@ -1,35 +1,35 @@
+import { AppBar, Box, ThemeProvider, Toolbar, Typography } from "@mui/material";
 import type { NextPage } from "next";
-import Head from "next/head";
-import Image from "next/image";
-import styles from "../styles/Home.module.css";
-import {
-  AppBar,
-  Box,
-  Button,
-  SpeedDial,
-  SpeedDialAction,
-  SpeedDialIcon,
-  ThemeProvider,
-  Toolbar,
-  Typography,
-} from "@mui/material";
+import YearDataGrid from "../components/YearDataGrid";
 import theme, { colors } from "../theme";
 
 const Home: NextPage = () => {
   /**
-   * Header Componet
+   * Header Component
    */
   const renderHeader = () => {
     return (
-      <AppBar position="static">
+      <AppBar
+        position="static"
+        sx={{ backgroundColor: colors.SURFACE_BACKGROUND }}
+      >
         <Toolbar variant="dense">
-          <Typography variant="h3">Fives</Typography>
+          <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1 }}>
+            Daily Tracker
+          </Typography>
         </Toolbar>
       </AppBar>
     );
   };
 
-  return <ThemeProvider theme={theme}>{renderHeader()}</ThemeProvider>;
+  return (
+    <ThemeProvider theme={theme}>
+      {renderHeader()}
+      <Box>
+        <YearDataGrid year={2022} />
+      </Box>
+    </ThemeProvider>
+  );
 };
 
 export default Home;

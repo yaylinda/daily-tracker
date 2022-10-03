@@ -2,6 +2,7 @@ import { createTheme } from "@mui/material";
 
 export const colors = Object.freeze({
   BACKGROUND: "#18191a",
+  SURFACE_BACKGROUND: "#242526",
   TEXT: "#f5f6f7",
 });
 
