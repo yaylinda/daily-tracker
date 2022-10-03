@@ -1,7 +1,7 @@
 import { chunk } from "lodash";
 import moment from "moment";
 import { DayData } from "../types";
-import { NUM_DAYS_IN_WEEK } from "./constants";
+import { NUM_DAYS_IN_WEEK, NUM_MONTHS } from "./constants";
 
 const PADDING_DAY = {
   year: -1,
@@ -36,5 +36,12 @@ export const getMonthData = (year: number, month: number): DayData[][] => {
   return chunk(
     [...daysBeforeMonth, ...daysInMonth, ...daysAfterMonth],
     NUM_DAYS_IN_WEEK
+  );
+};
+
+export const getMonthLabels = (): string[] => {
+  const startMoment = moment(new Date()).startOf("year");
+  return Array.from(Array(NUM_MONTHS), (_, i) =>
+    startMoment.month(i).format("MMMM")
   );
 };

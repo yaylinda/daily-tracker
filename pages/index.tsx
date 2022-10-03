@@ -25,9 +25,7 @@ const Home: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      <Box>
-        <YearDataGrid year={2022} />
-      </Box>
+      <YearDataGrid year={2022} />
     </ThemeProvider>
   );
 };

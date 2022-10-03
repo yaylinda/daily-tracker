@@ -1,4 +1,8 @@
-import { Box } from "@mui/material";
+import { Box, Paper, Typography } from "@mui/material";
+import moment from "moment";
+import React from "react";
+import { colors } from "../theme";
+import { getMonthLabels } from "../utils/monthData";
 import MonthDataGrid from "./MonthDataGrid";
 
 export interface YearDataGridProps {
@@ -6,7 +10,20 @@ export interface YearDataGridProps {
 }
 
 const YearDataGrid = ({ year }: YearDataGridProps) => {
-  return <MonthDataGrid year={year} month={0} />;
+  const monthLabels = React.useMemo(() => getMonthLabels(), []);
+
+  return (
+    <Box sx={{ color: colors.TEXT }}>
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        {monthLabels.map((monthLabel) => (
+          <Box>
+            <Typography>{monthLabel}</Typography>
+          </Box>
+        ))}
+      </Box>
+      <MonthDataGrid year={year} month={0} />
+    </Box>
+  );
 };
 
 export default YearDataGrid;
