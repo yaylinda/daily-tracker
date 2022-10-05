@@ -50,7 +50,7 @@ export const getDaysInMonth = (year: number, month: number): DayInMonth[][] => {
 export const getMonthLabels = (): string[] => {
   const startMoment = moment(new Date()).startOf("year");
   return Array.from(Array(NUM_MONTHS), (_, i) =>
-    startMoment.month(i).format("MMMM")
+    startMoment.month(i).format("MMM").toUpperCase()
   );
 };
 

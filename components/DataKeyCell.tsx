@@ -17,7 +17,7 @@ const DataKeyCell = ({ dataKeyLabel }: DataKeyCellProps) => {
         alignItems: "center",
       }}
     >
-      <Typography>{dataKeyLabel}</Typography>
+      <Typography variant="subtitle2">{dataKeyLabel}</Typography>
     </Box>
   );
 };

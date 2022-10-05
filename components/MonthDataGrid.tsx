@@ -1,4 +1,5 @@
 import { Box, Paper, Typography } from "@mui/material";
+import moment from "moment";
 import React from "react";
 import useDayDataStore from "../stores/dayDataStore";
 import { colors } from "../theme";
@@ -27,12 +28,17 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
 
   const renderDayContent = (day: number) => {
     if (day < 0) {
-      return <Typography variant="body1">{""}</Typography>;
+      return <Typography variant="body2">{""}</Typography>;
     }
     const dateKey = getDateKey({ year, month, day });
     const hasData = data.has(dateKey);
+    const dayMoment = moment(new Date(year, month, day));
+    const isBefore = dayMoment.isBefore(moment(), "day");
     return (
-      <Typography variant="body1" color={hasData ? "green" : colors.TEXT}>
+      <Typography
+        variant="body2"
+        color={hasData ? "green" : isBefore ? colors.LIGHTER_TEXT : colors.TEXT}
+      >
         {day}
       </Typography>
     );

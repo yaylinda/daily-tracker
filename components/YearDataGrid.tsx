@@ -13,7 +13,14 @@ const YearDataGrid = ({ dataKey, year }: YearDataGridProps) => {
   return (
     <Box sx={{ display: "flex", flexDirection: "row" }}>
       <DataKeyCell dataKeyLabel={dataKey.label} />
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          overflowX: "scroll",
+          gap: 2,
+        }}
+      >
         {Array.from(Array(NUM_MONTHS)).map((_, i) => (
           <MonthDataGrid
             key={`${dataKey.id}_${year}_${i}`}

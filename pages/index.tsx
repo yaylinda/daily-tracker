@@ -57,7 +57,6 @@ const Home: NextPage = () => {
         <Box
           sx={{
             display: "flex",
-            overflowX: "scroll",
             flexDirection: "column",
             color: colors.TEXT,
             gap: 2,
