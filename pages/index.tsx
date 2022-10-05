@@ -14,11 +14,12 @@ import useViewStore from "../stores/viewStore";
 import theme, { colors } from "../theme";
 import { MONTH_WIDTH } from "../utils/constants";
 import { getMonthLabels } from "../utils/monthGridUtil";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import MonthLabelRow from "../components/MonthLabelRow";
 
 const Home: NextPage = () => {
   const { year } = useViewStore();
   const { dataKeys } = useDataKeyStore();
-  const monthLabels = React.useMemo(() => getMonthLabels(), []);
 
   /**
    * Header Component
@@ -29,7 +30,7 @@ const Home: NextPage = () => {
         position="static"
         sx={{ backgroundColor: colors.SURFACE_BACKGROUND }}
       >
-        <Toolbar variant="dense">
+        <Toolbar>
           <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1 }}>
             Daily Tracker
           </Typography>
@@ -41,8 +42,16 @@ const Home: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      <Stack sx={{ color: colors.TEXT, margin: 10 }}>
-        <Box sx={{ display: "flex", flexDirection: "row", marginBottom: 10 }}>
+      <Stack
+        sx={{
+          color: colors.TEXT,
+          marginTop: 10,
+          marginBottom: 10,
+          marginLeft: 5,
+          marginRight: 5,
+        }}
+      >
+        <Box sx={{ display: "flex", flexDirection: "row", marginBottom: 5 }}>
           <Typography variant="h1">{year}</Typography>
         </Box>
         <Box
@@ -51,24 +60,10 @@ const Home: NextPage = () => {
             overflowX: "scroll",
             flexDirection: "column",
             color: colors.TEXT,
+            gap: 2,
           }}
         >
-          <Box sx={{ display: "flex", flexDirection: "row" }}>
-            {monthLabels.map((monthLabel) => (
-              <Box
-                key={`${monthLabel}`}
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  minWidth: MONTH_WIDTH,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Typography>{monthLabel}</Typography>
-              </Box>
-            ))}
-          </Box>
+          <MonthLabelRow />
           <Stack>
             {dataKeys.map((dataKey) => (
               <YearDataGrid year={year} dataKey={dataKey} />

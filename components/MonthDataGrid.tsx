@@ -16,7 +16,6 @@ export interface MonthDataGridProps {
 }
 
 const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
-  const dayOfWeekLabels = React.useMemo(() => getDayOfWeekLabels(), []);
   const daysInMonth = React.useMemo(
     () => getDaysInMonth(year, month),
     [year, month]
@@ -41,23 +40,6 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
-      <Box sx={{ display: "flex", flexDirection: "row" }}>
-        {dayOfWeekLabels.map((dow, i) => (
-          <Box
-            key={`${month}_dow_${i}`}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              width: DAY_WIDTH,
-              height: DAY_WIDTH,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Typography variant="body1">{dow}</Typography>
-          </Box>
-        ))}
-      </Box>
       {daysInMonth.map((weekInMonth, weekNum) => (
         <Box
           key={`month_${month}_week_${weekNum}`}

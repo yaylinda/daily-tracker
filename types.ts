@@ -16,7 +16,7 @@ export interface DayData extends DayDate {
 
 export interface DataKey {
   id: string;
-  displayName: string;
+  label: string;
 }
 
 /**

@@ -10,8 +10,8 @@ interface DataKeyStoreState {
 const useDataKeyStore = create<DataKeyStoreState>()((set, get) => ({
   dataKeys: [
     // TODO - delete this
-    { id: "dk1", displayName: "Data Key 1" },
-    { id: "dk2", displayName: "Data Key 2" },
+    { id: "dk1", label: "Data Key 1" },
+    { id: "dk2", label: "Data Key 2" },
   ],
   init: () => {
     // TODO - implement fetching from firebase
