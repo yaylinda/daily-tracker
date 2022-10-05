@@ -1,8 +1,8 @@
 import create from "zustand";
-import { DayData } from "../types";
+import { DayData, DayDataMap } from "../types";
 
 interface DayDataStoreState {
-  dayData: DayData[];
+  dayDataMap: DayDataMap;
   init: () => void;
   addDayData: (
     dataKeyId: string,
@@ -13,7 +13,13 @@ interface DayDataStoreState {
 }
 
 const useDayDataStore = create<DayDataStoreState>()((set, get) => ({
-  dayData: [],
+  dayDataMap: {
+    // TODO - delete this
+    2022: {
+      dk1: new Set(["2022_01_01", "2022_01_02"]),
+      dk2: new Set(["2022_02_01", "2022_02_02"]),
+    },
+  },
   init: () => {
     // TODO - implement fetching from firebase
   },

@@ -18,3 +18,13 @@ export interface DataKey {
   id: string;
   displayName: string;
 }
+
+/**
+ * Example:
+ * {
+ *   2022: { 'abc123' : Set(['2022-01-01', '2022-01-03']) }
+ * }
+ */
+export type DayDataMap = {
+  [year in number]: { [dataKeyId in string]: Set<string> };
+};

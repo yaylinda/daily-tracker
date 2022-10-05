@@ -69,10 +69,11 @@ const Home: NextPage = () => {
               </Box>
             ))}
           </Box>
-          <YearDataGrid
-            year={2022}
-            dataKey={{ id: "abc", displayName: "Pooped" }}
-          />
+          <Stack>
+            {dataKeys.map((dataKey) => (
+              <YearDataGrid year={year} dataKey={dataKey} />
+            ))}
+          </Stack>
         </Box>
       </Stack>
     </ThemeProvider>

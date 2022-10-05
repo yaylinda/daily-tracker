@@ -1,25 +1,48 @@
 import { Box, Paper, Typography } from "@mui/material";
 import React from "react";
+import useDayDataStore from "../stores/dayDataStore";
+import { colors } from "../theme";
 import { DAY_WIDTH } from "../utils/constants";
-import { getDaysInMonth } from "../utils/monthGridUtil";
-
-const DAYS_OF_WEEK_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
+import {
+  getDateKey,
+  getDayOfWeekLabels,
+  getDaysInMonth,
+} from "../utils/monthGridUtil";
 
 export interface MonthDataGridProps {
+  dataKeyId: string;
   year: number;
   month: number;
 }
 
-const MonthDataGrid = ({ year, month }: MonthDataGridProps) => {
+const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
+  const dayOfWeekLabels = React.useMemo(() => getDayOfWeekLabels(), []);
   const daysInMonth = React.useMemo(
     () => getDaysInMonth(year, month),
     [year, month]
   );
 
+  const data = useDayDataStore(
+    (state) => state.dayDataMap[year]?.[dataKeyId] || new Set([])
+  );
+
+  const renderDayContent = (day: number) => {
+    if (day < 0) {
+      return <Typography variant="body1">{""}</Typography>;
+    }
+    const dateKey = getDateKey({ year, month, day });
+    const hasData = data.has(dateKey);
+    return (
+      <Typography variant="body1" color={hasData ? "green" : colors.TEXT}>
+        {day}
+      </Typography>
+    );
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
       <Box sx={{ display: "flex", flexDirection: "row" }}>
-        {DAYS_OF_WEEK_LABELS.map((dow, i) => (
+        {dayOfWeekLabels.map((dow, i) => (
           <Box
             key={`${month}_dow_${i}`}
             sx={{
@@ -52,9 +75,7 @@ const MonthDataGrid = ({ year, month }: MonthDataGridProps) => {
                 alignItems: "center",
               }}
             >
-              <Typography variant="body1">
-                {dayInWeek.day > 0 ? dayInWeek.day : ""}
-              </Typography>
+              {renderDayContent(dayInWeek.day)}
             </Box>
           ))}
         </Box>

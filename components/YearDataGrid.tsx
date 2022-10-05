@@ -22,6 +22,7 @@ const YearDataGrid = ({ dataKey, year }: YearDataGridProps) => {
         {Array.from(Array(NUM_MONTHS)).map((_, i) => (
           <MonthDataGrid
             key={`${dataKey.id}_${year}_${i}`}
+            dataKeyId={dataKey.id}
             year={year}
             month={i}
           />
