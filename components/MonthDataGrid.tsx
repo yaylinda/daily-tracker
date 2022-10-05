@@ -1,7 +1,7 @@
 import { Box, Paper, Typography } from "@mui/material";
 import React from "react";
 import { DAY_WIDTH } from "../utils/constants";
-import { getMonthData } from "../utils/monthData";
+import { getDaysInMonth } from "../utils/monthGridUtil";
 
 const DAYS_OF_WEEK_LABELS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -11,7 +11,10 @@ export interface MonthDataGridProps {
 }
 
 const MonthDataGrid = ({ year, month }: MonthDataGridProps) => {
-  const data = React.useMemo(() => getMonthData(year, month), [year, month]);
+  const daysInMonth = React.useMemo(
+    () => getDaysInMonth(year, month),
+    [year, month]
+  );
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -32,12 +35,12 @@ const MonthDataGrid = ({ year, month }: MonthDataGridProps) => {
           </Box>
         ))}
       </Box>
-      {data.map((weekData, weekNum) => (
+      {daysInMonth.map((weekInMonth, weekNum) => (
         <Box
           key={`month_${month}_week_${weekNum}`}
           sx={{ display: "flex", flexDirection: "row" }}
         >
-          {weekData.map((dayData, dayNum) => (
+          {weekInMonth.map((dayInWeek, dayNum) => (
             <Box
               key={`month_${month}_week_${weekNum}_day_${dayNum}`}
               sx={{
@@ -50,7 +53,7 @@ const MonthDataGrid = ({ year, month }: MonthDataGridProps) => {
               }}
             >
               <Typography variant="body1">
-                {dayData.day > 0 ? dayData.day : ""}
+                {dayInWeek.day > 0 ? dayInWeek.day : ""}
               </Typography>
             </Box>
           ))}

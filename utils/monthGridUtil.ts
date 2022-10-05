@@ -1,34 +1,32 @@
 import { chunk } from "lodash";
 import moment from "moment";
-import { DayData } from "../types";
+import { DayInMonth } from "../types";
 import { NUM_DAYS_IN_WEEK, NUM_MONTHS } from "./constants";
 
 const PADDING_DAY = {
   year: -1,
   month: -1,
   day: -1,
-  data: false,
 };
 
-export const getMonthData = (year: number, month: number): DayData[][] => {
+export const getDaysInMonth = (year: number, month: number): DayInMonth[][] => {
   const monthMoment = moment(new Date(year, month, 1));
 
-  const daysBeforeMonth: DayData[] = Array.from(
+  const daysBeforeMonth: DayInMonth[] = Array.from(
     Array(monthMoment.weekday()),
     (_, i) => ({ ...PADDING_DAY })
   );
 
-  const daysInMonth: DayData[] = Array.from(
+  const daysInMonth: DayInMonth[] = Array.from(
     Array(monthMoment.daysInMonth()),
     (_, i) => ({
       year,
       month,
       day: i + 1,
-      data: false, // TODO
     })
   );
 
-  const daysAfterMonth: DayData[] = Array.from(
+  const daysAfterMonth: DayInMonth[] = Array.from(
     Array(NUM_DAYS_IN_WEEK - (monthMoment.endOf("month").weekday() + 1)),
     (_, i) => ({ ...PADDING_DAY })
   );
