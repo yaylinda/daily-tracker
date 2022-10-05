@@ -71,5 +71,8 @@ export const getDayOfWeekLabels = (): string[] => {
  * @param param0
  * @returns
  */
-export const getDateKey = ({ year, month, day }: DayDate): string =>
-  `${year}_${month}_${day}`;
+export const getDateKey = ({ year, month, day }: DayDate): string => {
+  const monthStr = month <= 9 ? `0${month}` : month;
+  const dayStr = day <= 9 ? `0${day}` : day;
+  return `${year}_${monthStr}_${dayStr}`;
+};
