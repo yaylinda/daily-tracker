@@ -1,6 +1,8 @@
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
+import { useEffect, useRef } from "react";
+import useScrollStore from "../stores/scrollStore";
 import { DataKey } from "../types";
-import { DATA_KEY_LABEL_WIDTH, NUM_MONTHS } from "../utils/constants";
+import { NUM_MONTHS } from "../utils/constants";
 import DataKeyCell from "./DataKeyCell";
 import MonthDataGrid from "./MonthDataGrid";
 
@@ -10,6 +12,19 @@ export interface YearDataGridProps {
 }
 
 const YearDataGrid = ({ dataKey, year }: YearDataGridProps) => {
+  const rowRef = useRef();
+  const { leftScroll: horizontalScroll, setLeftScroll: setHorizontalScroll } =
+    useScrollStore();
+
+  useEffect(() => {
+    rowRef.current.scrollLeft = horizontalScroll;
+  }, [horizontalScroll]);
+
+  const onScroll = () => {
+    const { scrollLeft } = rowRef.current;
+    setHorizontalScroll(scrollLeft);
+  };
+
   return (
     <Box sx={{ display: "flex", flexDirection: "row" }}>
       <DataKeyCell dataKeyLabel={dataKey.label} />
@@ -20,6 +35,8 @@ const YearDataGrid = ({ dataKey, year }: YearDataGridProps) => {
           overflowX: "scroll",
           gap: 2,
         }}
+        ref={rowRef}
+        onScroll={onScroll}
       >
         {Array.from(Array(NUM_MONTHS)).map((_, i) => (
           <MonthDataGrid

@@ -65,7 +65,11 @@ const Home: NextPage = () => {
           <MonthLabelRow />
           <Stack>
             {dataKeys.map((dataKey) => (
-              <YearDataGrid year={year} dataKey={dataKey} />
+              <YearDataGrid
+                key={`${year}_${dataKey.id}`}
+                year={year}
+                dataKey={dataKey}
+              />
             ))}
           </Stack>
         </Box>

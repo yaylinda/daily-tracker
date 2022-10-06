@@ -1,15 +1,28 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
-import { DATA_KEY_LABEL_WIDTH, MONTH_WIDTH } from "../utils/constants";
-import { getMonthLabels } from "../utils/monthGridUtil";
-import DayOfWeekLabelRow from "./DayOfWeekLabelRow";
-import DataKeyCell from "./DataKeyCell";
 import moment from "moment";
+import React from "react";
+import useScrollStore from "../stores/scrollStore";
 import { colors } from "../theme";
+import { MONTH_WIDTH } from "../utils/constants";
+import { getMonthLabels } from "../utils/monthGridUtil";
+import DataKeyCell from "./DataKeyCell";
+import DayOfWeekLabelRow from "./DayOfWeekLabelRow";
 
 const MonthLabelRow = () => {
   const monthLabels = React.useMemo(() => getMonthLabels(), []);
   const currentMonth = moment().month();
+  const rowRef = React.useRef();
+  const { setLeftScroll: setHorizontalScroll, leftScroll: horizontalScroll } =
+    useScrollStore();
+
+  React.useEffect(() => {
+    rowRef.current.scrollLeft = horizontalScroll;
+  }, [horizontalScroll]);
+
+  const onScroll = () => {
+    const { scrollLeft } = rowRef.current;
+    setHorizontalScroll(scrollLeft);
+  };
 
   return (
     <Box sx={{ display: "flex", flexDirection: "row" }}>
@@ -21,6 +34,8 @@ const MonthLabelRow = () => {
           overflowX: "scroll",
           gap: 2,
         }}
+        ref={rowRef}
+        onScroll={onScroll}
       >
         {monthLabels.map((monthLabel, month) => (
           <Box
