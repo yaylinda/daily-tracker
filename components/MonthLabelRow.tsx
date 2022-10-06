@@ -11,17 +11,20 @@ import DayOfWeekLabelRow from "./DayOfWeekLabelRow";
 const MonthLabelRow = () => {
   const monthLabels = React.useMemo(() => getMonthLabels(), []);
   const currentMonth = moment().month();
-  const rowRef = React.useRef();
-  const { setLeftScroll: setHorizontalScroll, leftScroll: horizontalScroll } =
-    useScrollStore();
+  const rowRef = React.useRef<HTMLDivElement>();
+  const { setLeftScroll, leftScroll } = useScrollStore();
 
   React.useEffect(() => {
-    rowRef.current.scrollLeft = horizontalScroll;
-  }, [horizontalScroll]);
+    if (rowRef && rowRef.current) {
+      rowRef.current.scrollLeft = leftScroll;
+    }
+  }, [leftScroll]);
 
   const onScroll = () => {
-    const { scrollLeft } = rowRef.current;
-    setHorizontalScroll(scrollLeft);
+    if (rowRef && rowRef.current) {
+      const { scrollLeft } = rowRef.current;
+      setLeftScroll(scrollLeft);
+    }
   };
 
   return (

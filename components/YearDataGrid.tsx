@@ -1,5 +1,5 @@
 import { Box } from "@mui/material";
-import { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import useScrollStore from "../stores/scrollStore";
 import { DataKey } from "../types";
 import { NUM_MONTHS } from "../utils/constants";
@@ -12,17 +12,20 @@ export interface YearDataGridProps {
 }
 
 const YearDataGrid = ({ dataKey, year }: YearDataGridProps) => {
-  const rowRef = useRef();
-  const { leftScroll: horizontalScroll, setLeftScroll: setHorizontalScroll } =
-    useScrollStore();
+  const rowRef = useRef<HTMLDivElement>();
+  const { leftScroll, setLeftScroll } = useScrollStore();
 
-  useEffect(() => {
-    rowRef.current.scrollLeft = horizontalScroll;
-  }, [horizontalScroll]);
+  React.useEffect(() => {
+    if (rowRef && rowRef.current) {
+      rowRef.current.scrollLeft = leftScroll;
+    }
+  }, [leftScroll]);
 
   const onScroll = () => {
-    const { scrollLeft } = rowRef.current;
-    setHorizontalScroll(scrollLeft);
+    if (rowRef && rowRef.current) {
+      const { scrollLeft } = rowRef.current;
+      setLeftScroll(scrollLeft);
+    }
   };
 
   return (
