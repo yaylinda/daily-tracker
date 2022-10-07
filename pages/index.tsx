@@ -32,7 +32,7 @@ const Home: NextPage = () => {
       >
         <Toolbar>
           <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1 }}>
-            Daily Tracker
+            Life as Booleans
           </Typography>
         </Toolbar>
       </AppBar>

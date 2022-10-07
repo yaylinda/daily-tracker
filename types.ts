@@ -1,3 +1,5 @@
+import { OAuthCredential, UserCredential } from "firebase/auth";
+
 export interface DayDate {
   year: number;
   month: number;
@@ -28,3 +30,11 @@ export interface DataKey {
 export type DayDataMap = {
   [year in number]: { [dataKeyId in string]: Set<string> };
 };
+
+/**
+ *
+ */
+export interface SignInResult {
+  oAuthCredential: OAuthCredential | null;
+  userCredential: UserCredential;
+}
