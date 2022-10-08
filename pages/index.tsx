@@ -11,7 +11,7 @@ import type { NextPage } from "next";
 import MonthLabelRow from "../components/MonthLabelRow";
 import UserAvatar from "../components/UserAvatar";
 import YearDataGrid from "../components/YearDataGrid";
-import SignInModal from "../modals/SignInModal";
+import SignInModal from "../dialogs/LogInDialog";
 import useDataKeyStore from "../stores/dataKeyStore";
 import useUserStore from "../stores/userStore";
 import useViewStore from "../stores/viewStore";

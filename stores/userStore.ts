@@ -7,6 +7,7 @@ import {
   signOutAsync,
 } from "../auth";
 import { SignInResult } from "../types";
+import useViewStore from "./viewStore";
 
 interface UserStoreState {
   oAuthCredential: OAuthCredential | null;
@@ -41,6 +42,8 @@ const useUserStore = create<UserStoreState>()((set, get) => ({
         isAuthed: true,
         isAnon: anon,
       }));
+
+      useViewStore.getState().closeLoginDialog();
     } catch (e) {
       console.log(`SIGN IN ERROR: ${JSON.stringify(e)}`);
       // TODO

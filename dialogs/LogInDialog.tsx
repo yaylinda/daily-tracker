@@ -7,17 +7,11 @@ import useViewStore from "../stores/viewStore";
 
 const SignInModal = () => {
   const { showLoginDialog, closeLoginDialog } = useViewStore();
-  const { isAuthed, signIn } = useUserStore();
-
-  React.useEffect(() => {
-    if (isAuthed) {
-      closeLoginDialog();
-    }
-  }, [isAuthed]);
+  const { isAuthed, isAnon, signIn } = useUserStore();
 
   return (
     <Dialog onClose={closeLoginDialog} open={showLoginDialog}>
-      <DialogTitle>Sign In Options</DialogTitle>
+      <DialogTitle>{isAnon ? "Link Account" : "Log In Options"}</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Button
           variant="outlined"
@@ -25,16 +19,18 @@ const SignInModal = () => {
           startIcon={<GoogleIcon />}
           onClick={() => signIn(false)}
         >
-          Sign in with Google
+          Log in with Google
         </Button>
-        <Button
-          variant="outlined"
-          color="inherit"
-          startIcon={<NoAccountsIcon />}
-          onClick={() => signIn(true)}
-        >
-          Sign in anonymously
-        </Button>
+        {!(isAuthed && isAnon) && (
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<NoAccountsIcon />}
+            onClick={() => signIn(true)}
+          >
+            Use without logging in
+          </Button>
+        )}
       </DialogContent>
     </Dialog>
   );
