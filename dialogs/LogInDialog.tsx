@@ -2,12 +2,11 @@ import GoogleIcon from "@mui/icons-material/Google";
 import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import React from "react";
-import useUserStore from "../stores/userStore";
-import useViewStore from "../stores/viewStore";
+import useStore from "../store";
 
 const SignInModal = () => {
-  const { showLoginDialog, closeLoginDialog } = useViewStore();
-  const { isAuthed, isAnon, signIn } = useUserStore();
+  const { showLoginDialog, closeLoginDialog, isAuthed, isAnon, signIn } =
+    useStore();
 
   return (
     <Dialog onClose={closeLoginDialog} open={showLoginDialog}>

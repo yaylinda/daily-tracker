@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import React, { useRef } from "react";
-import useScrollStore from "../stores/scrollStore";
+import useStore from "../store";
 import { DataKey } from "../types";
 import { NUM_MONTHS } from "../utils/constants";
 import DataKeyCell from "./DataKeyCell";
@@ -13,7 +13,7 @@ export interface YearDataGridProps {
 
 const YearDataGrid = ({ dataKey, year }: YearDataGridProps) => {
   const rowRef = useRef<HTMLDivElement>();
-  const { leftScroll, setLeftScroll } = useScrollStore();
+  const { leftScroll, setLeftScroll } = useStore();
 
   React.useEffect(() => {
     if (rowRef && rowRef.current) {

@@ -12,17 +12,11 @@ import MonthLabelRow from "../components/MonthLabelRow";
 import UserAvatar from "../components/UserAvatar";
 import YearDataGrid from "../components/YearDataGrid";
 import SignInModal from "../dialogs/LogInDialog";
-import useDataKeyStore from "../stores/dataKeyStore";
-import useUserStore from "../stores/userStore";
-import useViewStore from "../stores/viewStore";
+import useStore from "../store";
 import theme, { colors } from "../theme";
 
 const Home: NextPage = () => {
-  const { year } = useViewStore();
-  const { dataKeys } = useDataKeyStore();
-  const { isAuthed } = useUserStore();
-  const { openLoginDialog } = useViewStore();
-
+  const { year, dataKeys, isAuthed, openLoginDialog } = useStore();
   /**
    * Header Component
    */

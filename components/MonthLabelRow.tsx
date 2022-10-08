@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import moment from "moment";
 import React from "react";
-import useScrollStore from "../stores/scrollStore";
+import useStore from "../store";
 import { colors } from "../theme";
 import { MONTH_WIDTH } from "../utils/constants";
 import { getMonthLabels } from "../utils/monthGridUtil";
@@ -12,7 +12,7 @@ const MonthLabelRow = () => {
   const monthLabels = React.useMemo(() => getMonthLabels(), []);
   const currentMonth = moment().month();
   const rowRef = React.useRef<HTMLDivElement>();
-  const { setLeftScroll, leftScroll } = useScrollStore();
+  const { setLeftScroll, leftScroll } = useStore();
 
   React.useEffect(() => {
     if (rowRef && rowRef.current) {

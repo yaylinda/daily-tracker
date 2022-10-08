@@ -16,8 +16,7 @@ import {
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import * as React from "react";
-import useUserStore from "../stores/userStore";
-import useViewStore from "../stores/viewStore";
+import useStore from "../store";
 import { colors } from "../theme";
 
 /**
@@ -60,8 +59,8 @@ function stringAvatar(name: string) {
 }
 
 const UserAvatar = () => {
-  const { oAuthCredential, userCredential, isAnon, signOut } = useUserStore();
-  const { openLoginDialog } = useViewStore();
+  const { oAuthCredential, user, isAnon, signOut, openLoginDialog } =
+    useStore();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
@@ -76,20 +75,14 @@ const UserAvatar = () => {
     setAnchorEl(null);
   };
 
-  if (!oAuthCredential && !userCredential) {
+  if (!oAuthCredential && !user) {
     return null;
   }
 
   return (
     <>
       <IconButton onClick={handleClick}>
-        <Avatar
-          {...stringAvatar(
-            userCredential!.user.displayName ||
-              userCredential!.user.email ||
-              "? ?"
-          )}
-        />
+        <Avatar {...stringAvatar(user!.displayName || user!.email || "? ?")} />
       </IconButton>
       <Menu
         anchorEl={anchorEl}
@@ -125,9 +118,7 @@ const UserAvatar = () => {
         transformOrigin={{ horizontal: "right", vertical: "top" }}
         anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
-        <MenuItem>
-          {userCredential!.user.displayName || "Anonymous User"}
-        </MenuItem>
+        <MenuItem>{user!.displayName || "Anonymous User"}</MenuItem>
         <Divider />
         {isAnon && (
           <MenuItem onClick={openLoginDialog}>

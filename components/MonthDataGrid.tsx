@@ -1,14 +1,10 @@
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import moment from "moment";
 import React from "react";
-import useDayDataStore from "../stores/dayDataStore";
+import useStore from "../store";
 import { colors } from "../theme";
 import { DAY_WIDTH } from "../utils/constants";
-import {
-  getDateKey,
-  getDayOfWeekLabels,
-  getDaysInMonth,
-} from "../utils/monthGridUtil";
+import { getDateKey, getDaysInMonth } from "../utils/monthGridUtil";
 
 export interface MonthDataGridProps {
   dataKeyId: string;
@@ -22,7 +18,7 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
     [year, month]
   );
 
-  const data = useDayDataStore(
+  const data = useStore(
     (state) => state.dayDataMap[year]?.[dataKeyId] || new Set([])
   );
 
