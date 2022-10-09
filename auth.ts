@@ -72,3 +72,16 @@ export function linkAnonymousUser(
     oAuthCredential.accessToken
   );
 }
+
+/**
+ *
+ * @param idToken
+ * @param accessToken
+ * @returns
+ */
+export function getOAuthCredentialFromTokens(
+  idToken?: string | null,
+  accessToken?: string | null
+) {
+  return GoogleAuthProvider.credential(idToken, accessToken);
+}

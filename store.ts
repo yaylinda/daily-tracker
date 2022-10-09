@@ -2,14 +2,17 @@ import { OAuthCredential, User } from "firebase/auth";
 import moment from "moment";
 import create from "zustand";
 import {
+  getOAuthCredentialFromTokens,
   linkAnonymousUser,
   signInAnon,
   signInWithGoogle,
   signOutAsync,
 } from "./auth";
 import { DataKey, DayDataMap, SignInResult } from "./types";
+import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 
 interface StoreState {
+  loading: boolean;
   init: () => void;
 
   dataKeys: DataKey[];
@@ -46,8 +49,38 @@ interface StoreState {
 }
 
 const useStore = create<StoreState>()((set, get) => ({
+  loading: true,
   init: () => {
-    // TODO - implement fetching from firebase
+    // Try to get the user back from local storage
+    const userStr = window.localStorage.getItem(LOCAL_STORAGE_KEYS.USER_KEY);
+    let user: User | null = null;
+    if (userStr) {
+      user = JSON.parse(userStr);
+    }
+
+    // Try to get the tokens and oauth credentials from local storage
+    const idToken =
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.ID_TOKEN_KEY) || null;
+    const accessToken =
+      window.localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY) || null;
+    let oAuthCredential: OAuthCredential | null = null;
+    if (idToken || accessToken) {
+      oAuthCredential = getOAuthCredentialFromTokens(idToken, accessToken);
+    }
+    if (oAuthCredential?.idToken) {
+      window.localStorage.setItem(
+        LOCAL_STORAGE_KEYS.ID_TOKEN_KEY,
+        oAuthCredential.idToken
+      );
+    }
+    if (oAuthCredential?.accessToken) {
+      window.localStorage.setItem(
+        LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY,
+        oAuthCredential.accessToken
+      );
+    }
+
+    // Fetch data for the userId and year
   },
 
   dataKeys: [

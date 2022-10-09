@@ -1,5 +1,10 @@
 import { OAuthCredential, UserCredential } from "firebase/auth";
 
+export interface SignInResult {
+  oAuthCredential: OAuthCredential | null;
+  userCredential: UserCredential;
+}
+
 export interface DayDate {
   year: number;
   month: number;
@@ -31,10 +36,19 @@ export type DayDataMap = {
   [year in number]: { [dataKeyId in string]: Set<string> };
 };
 
-/**
- *
- */
-export interface SignInResult {
-  oAuthCredential: OAuthCredential | null;
-  userCredential: UserCredential;
+/**************************************
+ * Firestore Types
+ *************************************/
+
+export interface UserData {
+  dataKeys: DataKeys | null;
+  yearData: YearData | null;
 }
+
+export type DataKeys = {
+  [dataKeyId in string]: DataKey;
+};
+
+export type YearData = {
+  [dataKeyId in string]: { [dateKey in string]: { value: boolean } };
+};

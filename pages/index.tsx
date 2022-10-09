@@ -2,6 +2,7 @@ import {
   AppBar,
   Box,
   Button,
+  LinearProgress,
   Stack,
   ThemeProvider,
   Toolbar,
@@ -16,7 +17,8 @@ import useStore from "../store";
 import theme, { colors } from "../theme";
 
 const Home: NextPage = () => {
-  const { year, dataKeys, isAuthed, openLoginDialog } = useStore();
+  const { year, dataKeys, isAuthed, loading, openLoginDialog } = useStore();
+
   /**
    * Header Component
    */
@@ -30,7 +32,7 @@ const Home: NextPage = () => {
           <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1 }}>
             Life as Booleans
           </Typography>
-          {isAuthed ? (
+          {loading ? null : isAuthed ? (
             <UserAvatar />
           ) : (
             <Button color="inherit" onClick={openLoginDialog}>
@@ -39,6 +41,14 @@ const Home: NextPage = () => {
           )}
         </Toolbar>
       </AppBar>
+    );
+  };
+
+  const renderLoading = () => {
+    return (
+      <Box sx={{ display: "flex", flexDirection: "row", marginBottom: 5 }}>
+        <Typography variant="h1">{year}</Typography>
+      </Box>
     );
   };
 
@@ -106,7 +116,7 @@ const Home: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      {renderBody()}
+      {loading ? <LinearProgress /> : renderBody()}
       <SignInModal />
     </ThemeProvider>
   );
