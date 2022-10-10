@@ -29,11 +29,20 @@ export interface DataKey {
 /**
  * Example:
  * {
- *   2022: { 'abc123' : Set(['2022-01-01', '2022-01-03']) }
+ *   'abc123' : ['2021-01-01', '2021-01-03']
  * }
  */
-export type DayDataMap = {
-  [year in number]: { [dataKeyId in string]: Set<string> };
+export type YearData = { [dataKeyId in string]: string[] };
+
+/**
+ * Example:
+ * {
+ *   2022: { 'abc123' : ['2022-01-01', '2022-01-03'] }
+ *   2021: { 'abc123' : ['2021-01-01', '2021-01-03'] }
+ * }
+ */
+export type YearDataMap = {
+  [year in number]: YearData;
 };
 
 /**************************************
@@ -42,13 +51,13 @@ export type DayDataMap = {
 
 export interface UserData {
   dataKeys: DataKeys | null;
-  yearData: YearData | null;
+  userYearData: UserYearData | null;
 }
 
 export type DataKeys = {
   [dataKeyId in string]: DataKey;
 };
 
-export type YearData = {
+export type UserYearData = {
   [dataKeyId in string]: { [dateKey in string]: { value: boolean } };
 };

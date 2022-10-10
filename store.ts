@@ -1,14 +1,15 @@
 import { OAuthCredential, User } from "firebase/auth";
+import { uniq } from "lodash";
 import moment from "moment";
 import create from "zustand";
 import {
   getOAuthCredentialFromTokens,
-  linkAnonymousUser,
   signInAnon,
   signInWithGoogle,
   signOutAsync,
 } from "./auth";
-import { DataKey, DayDataMap, SignInResult } from "./types";
+import { fetchUserData } from "./database";
+import { DataKey, YearDataMap, SignInResult } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 
 interface StoreState {
@@ -19,7 +20,7 @@ interface StoreState {
   addDataKey: (displayName: string) => void;
   deleteDataKey: (dataKeyId: string) => void;
 
-  dayDataMap: DayDataMap;
+  yearDataMap: YearDataMap;
   addDayData: (
     dataKeyId: string,
     year: number,
@@ -31,7 +32,8 @@ interface StoreState {
   leftScroll: number;
   setLeftScroll: (leftScroll: number) => void;
 
-  oAuthCredential: OAuthCredential | null;
+  idToken: string | null;
+  accessToken: string | null;
   user: User | null;
   isAuthed: boolean;
   isAnon: boolean;
@@ -50,7 +52,7 @@ interface StoreState {
 
 const useStore = create<StoreState>()((set, get) => ({
   loading: true,
-  init: () => {
+  init: async () => {
     // Try to get the user back from local storage
     const userStr = window.localStorage.getItem(LOCAL_STORAGE_KEYS.USER_KEY);
     let user: User | null = null;
@@ -59,35 +61,68 @@ const useStore = create<StoreState>()((set, get) => ({
     }
 
     // Try to get the tokens and oauth credentials from local storage
-    const idToken =
+    let idToken =
       window.localStorage.getItem(LOCAL_STORAGE_KEYS.ID_TOKEN_KEY) || null;
-    const accessToken =
+    let accessToken =
       window.localStorage.getItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY) || null;
     let oAuthCredential: OAuthCredential | null = null;
     if (idToken || accessToken) {
       oAuthCredential = getOAuthCredentialFromTokens(idToken, accessToken);
     }
     if (oAuthCredential?.idToken) {
+      idToken = oAuthCredential.idToken || null;
       window.localStorage.setItem(
         LOCAL_STORAGE_KEYS.ID_TOKEN_KEY,
         oAuthCredential.idToken
       );
     }
     if (oAuthCredential?.accessToken) {
+      accessToken = oAuthCredential.accessToken || null;
       window.localStorage.setItem(
         LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY,
         oAuthCredential.accessToken
       );
     }
 
-    // Fetch data for the userId and year
+    let dataKeys: DataKey[] = [];
+    let yearData: { [dataKeyId in string]: string[] } = {};
+    if (user?.uid) {
+      // If the user exists, fetch user data
+      const userData = await fetchUserData(user.uid, get().year);
+
+      if (userData.dataKeys) {
+        dataKeys = Object.values(userData.dataKeys);
+      }
+      if (userData.userYearData) {
+        yearData = Object.keys(userData.userYearData).reduce((prev, curr) => {
+          const dates = userData.userYearData![curr] || {};
+          prev[curr] = uniq(Object.keys(dates));
+          return prev;
+        }, {} as { [dataKeyId in string]: string[] });
+      }
+    }
+
+    // Update the state
+    set(
+      (state) =>
+        ({
+          ...state,
+          loading: false,
+          user,
+          isAuthed: user != null,
+          isAnon: user != null && idToken == null && accessToken == null,
+          idToken,
+          accessToken,
+          dataKeys,
+          yearDataMap: {
+            ...state.yearDataMap,
+            [get().year]: yearData,
+          },
+        } as StoreState)
+    );
   },
 
-  dataKeys: [
-    // TODO - delete this
-    { id: "dk1", label: "Data Key 1" },
-    { id: "dk2", label: "Data Key 2" },
-  ],
+  dataKeys: [],
   addDataKey: (displayName: string) => {
     // TODO - implement saving to firebase
   },
@@ -95,13 +130,7 @@ const useStore = create<StoreState>()((set, get) => ({
     // TODO - implement deleting from firebase
   },
 
-  dayDataMap: {
-    // TODO - delete this
-    2022: {
-      dk1: new Set(["2022_01_01", "2022_01_02"]),
-      dk2: new Set(["2022_02_01", "2022_02_02"]),
-    },
-  },
+  yearDataMap: {},
   addDayData: (dataKeyId: string, year: number, month: number, day: number) => {
     // TODO - implement saving to firebase
   },
@@ -110,9 +139,11 @@ const useStore = create<StoreState>()((set, get) => ({
   },
 
   leftScroll: 0,
-  setLeftScroll: (leftScroll: number) => set({ leftScroll }),
+  setLeftScroll: (leftScroll: number) =>
+    set({ leftScroll } as Partial<StoreState>),
 
-  oAuthCredential: null,
+  idToken: null,
+  accessToken: null,
   user: null,
   isAuthed: false,
   isAnon: false,
@@ -126,14 +157,35 @@ const useStore = create<StoreState>()((set, get) => ({
         result = await signInWithGoogle();
       }
 
-      set((state) => ({
-        ...state,
-        oAuthCredential: result.oAuthCredential,
-        user: result.userCredential.user,
-        isAuthed: true,
-        isAnon: anon,
-        showLoginDialog: false,
-      }));
+      localStorage.setItem(
+        LOCAL_STORAGE_KEYS.USER_KEY,
+        JSON.stringify(result.userCredential.user)
+      );
+      if (result.oAuthCredential?.idToken) {
+        localStorage.setItem(
+          LOCAL_STORAGE_KEYS.ID_TOKEN_KEY,
+          JSON.stringify(result.oAuthCredential?.idToken)
+        );
+      }
+      if (result.oAuthCredential?.accessToken) {
+        localStorage.setItem(
+          LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY,
+          JSON.stringify(result.oAuthCredential?.accessToken)
+        );
+      }
+
+      set(
+        (state) =>
+          ({
+            ...state,
+            idToken: result.oAuthCredential?.idToken || null,
+            accessToken: result.oAuthCredential?.accessToken || null,
+            user: result.userCredential.user,
+            isAuthed: true,
+            isAnon: anon,
+            showLoginDialog: false,
+          } as StoreState)
+      );
     } catch (e) {
       console.log(`SIGN IN ERROR: ${JSON.stringify(e)}`);
       // TODO - implement showing error message
@@ -141,38 +193,74 @@ const useStore = create<StoreState>()((set, get) => ({
   },
   signOut: () => {
     signOutAsync();
-    set((state) => ({
-      ...state,
-      oAuthCredential: null,
-      user: null,
-      isAuthed: false,
-      isAnon: false,
-    }));
+
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.USER_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.ID_TOKEN_KEY);
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY);
+
+    set(
+      (state) =>
+        ({
+          ...state,
+          idToken: null,
+          accessToken: null,
+          user: null,
+          isAuthed: false,
+          isAnon: false,
+        } as StoreState)
+    );
   },
   linkAnonymousUser: () => {
-    if (!get().oAuthCredential) {
+    if (!get().idToken && !get().accessToken) {
       return;
     }
 
-    const oAuthCredential = linkAnonymousUser(get().oAuthCredential!);
+    const oAuthCredential = getOAuthCredentialFromTokens(
+      get().idToken,
+      get().accessToken
+    );
+
+    if (oAuthCredential.idToken) {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEYS.ID_TOKEN_KEY,
+        JSON.stringify(oAuthCredential.idToken)
+      );
+    }
+    if (oAuthCredential.accessToken) {
+      localStorage.setItem(
+        LOCAL_STORAGE_KEYS.ACCESS_TOKEN_KEY,
+        JSON.stringify(oAuthCredential.accessToken)
+      );
+    }
 
     // TODO - update data from anon userId and update dataKey and dataMap
-    set((state) => ({
-      ...state,
-      oAuthCredential,
-      isAuthed: true,
-      isAnon: false,
-    }));
+    set(
+      (state) =>
+        ({
+          ...state,
+          idToken: oAuthCredential.idToken,
+          accessToken: oAuthCredential.accessToken,
+          isAuthed: true,
+          isAnon: false,
+        } as StoreState)
+    );
   },
 
   year: moment().year(),
-  previousYear: () => set((state) => ({ ...state, year: state.year - 1 })),
-  nextYear: () => set((state) => ({ ...state, year: state.year + 1 })),
+  previousYear: () => {
+    // TODO - fetch data for new year
+    set((state) => ({ ...state, year: state.year - 1 } as StoreState));
+  },
+  nextYear: () => {
+    // TODO - fetch data for new year
+    set((state) => ({ ...state, year: state.year + 1 } as StoreState));
+  },
 
   showLoginDialog: false,
-  openLoginDialog: () => set((state) => ({ ...state, showLoginDialog: true })),
+  openLoginDialog: () =>
+    set((state) => ({ ...state, showLoginDialog: true } as StoreState)),
   closeLoginDialog: () =>
-    set((state) => ({ ...state, showLoginDialog: false })),
+    set((state) => ({ ...state, showLoginDialog: false } as StoreState)),
 }));
 
 export default useStore;

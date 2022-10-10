@@ -1,13 +1,12 @@
 import {
   getAuth,
-  signInWithPopup,
-  signInAnonymously,
   GoogleAuthProvider,
+  signInAnonymously,
+  signInWithPopup,
   signOut,
 } from "firebase/auth";
 import app from "./firebase";
 import { SignInResult } from "./types";
-import { OAuthCredential, UserCredential } from "firebase/auth";
 
 // The auth provider object
 const provider = new GoogleAuthProvider();
@@ -57,20 +56,6 @@ export async function signInAnon(): Promise<SignInResult> {
  */
 export async function signOutAsync(): Promise<void> {
   return signOut(auth);
-}
-
-/**
- *
- * @param oAuthCredential
- * @returns
- */
-export function linkAnonymousUser(
-  oAuthCredential: OAuthCredential
-): OAuthCredential {
-  return GoogleAuthProvider.credential(
-    oAuthCredential.idToken,
-    oAuthCredential.accessToken
-  );
 }
 
 /**

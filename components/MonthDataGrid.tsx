@@ -19,7 +19,7 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
   );
 
   const data = useStore(
-    (state) => state.dayDataMap[year]?.[dataKeyId] || new Set([])
+    (state) => state.yearDataMap[year]?.[dataKeyId] || new Set([])
   );
 
   const renderDayContent = (day: number) => {

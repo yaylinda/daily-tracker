@@ -7,7 +7,7 @@ import {
   setDoc,
 } from "firebase/firestore";
 import app from "./firebase";
-import { DataKey, DataKeys, DayDate, UserData, YearData } from "./types";
+import { DataKey, DataKeys, DayDate, UserData, UserYearData } from "./types";
 import { getDateKey } from "./utils/monthGridUtil";
 
 // The firestore db object
@@ -32,9 +32,9 @@ export const fetchUserData = async (
   const dataKeys = await fetchDocFromRef<DataKeys>(dataKeysRef);
 
   const yearDataRef = doc(db, userId, `${year}`);
-  const yearData = await fetchDocFromRef<YearData>(yearDataRef);
+  const userYearData = await fetchDocFromRef<UserYearData>(yearDataRef);
 
-  return { dataKeys, yearData };
+  return { dataKeys, userYearData };
 };
 
 const fetchDocFromRef = async <T>(
