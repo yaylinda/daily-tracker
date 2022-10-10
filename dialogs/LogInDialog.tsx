@@ -4,7 +4,7 @@ import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import React from "react";
 import useStore from "../store";
 
-const SignInModal = () => {
+const LogInDialog = () => {
   const { showLoginDialog, closeLoginDialog, isAuthed, isAnon, signIn } =
     useStore();
 
@@ -35,4 +35,4 @@ const SignInModal = () => {
   );
 };
 
-export default SignInModal;
+export default LogInDialog;

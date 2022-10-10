@@ -1,21 +1,15 @@
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
 import LoginIcon from "@mui/icons-material/Login";
 import Logout from "@mui/icons-material/Logout";
 import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
   Divider,
   IconButton,
   ListItemIcon,
   Menu,
   MenuItem,
-  Typography,
 } from "@mui/material";
 import Avatar from "@mui/material/Avatar";
 import * as React from "react";
+import ConfirmLogOutDialog from "../dialogs/ConfirmLogOutDialog";
 import useStore from "../store";
 import { colors } from "../theme";
 
@@ -59,7 +53,7 @@ function stringAvatar(name: string) {
 }
 
 const UserAvatar = () => {
-  const { oAuthCredential, user, isAnon, signOut, openLoginDialog } =
+  const { idToken, accessToken, user, isAnon, signOut, openLoginDialog } =
     useStore();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -75,7 +69,7 @@ const UserAvatar = () => {
     setAnchorEl(null);
   };
 
-  if (!oAuthCredential && !user) {
+  if (!idToken && !accessToken && !user) {
     return null;
   }
 
@@ -135,32 +129,10 @@ const UserAvatar = () => {
           Logout
         </MenuItem>
       </Menu>
-      <Dialog
+      <ConfirmLogOutDialog
         open={showConfirmSignOutDialog}
         onClose={() => setShowConfirmSignOutDialog(false)}
-      >
-        <DialogTitle>Logout</DialogTitle>
-        <DialogContent>
-          {isAnon && (
-            <Typography>
-              As an Anonymous User, you will not be able to recover your data if
-              you log out without linking your Google Account
-            </Typography>
-          )}
-          <Typography>Are you sure you want to log out?</Typography>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "space-between" }}>
-          <IconButton
-            sx={{ color: "red" }}
-            onClick={() => setShowConfirmSignOutDialog(false)}
-          >
-            <CloseIcon fontSize="large" />
-          </IconButton>
-          <IconButton sx={{ color: "green" }} onClick={signOut}>
-            <CheckIcon fontSize="large" />
-          </IconButton>
-        </DialogActions>
-      </Dialog>
+      />
     </>
   );
 };

@@ -48,6 +48,10 @@ interface StoreState {
   showLoginDialog: boolean;
   openLoginDialog: () => void;
   closeLoginDialog: () => void;
+
+  showAddDataKeyDialog: boolean;
+  openAddDataKeyDialog: () => void;
+  closeAddDataKeyDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
@@ -261,6 +265,12 @@ const useStore = create<StoreState>()((set, get) => ({
     set((state) => ({ ...state, showLoginDialog: true } as StoreState)),
   closeLoginDialog: () =>
     set((state) => ({ ...state, showLoginDialog: false } as StoreState)),
+
+  showAddDataKeyDialog: false,
+  openAddDataKeyDialog: () =>
+    set((state) => ({ ...state, showAddDataKeyDialog: true } as StoreState)),
+  closeAddDataKeyDialog: () =>
+    set((state) => ({ ...state, showAddDataKeyDialog: false } as StoreState)),
 }));
 
 export default useStore;
