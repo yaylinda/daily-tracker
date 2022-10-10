@@ -1,17 +1,17 @@
 import CheckIcon from "@mui/icons-material/Check";
 import CloseIcon from "@mui/icons-material/Close";
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
-  SliderValueLabel,
   TextField,
 } from "@mui/material";
 import React from "react";
 import useStore from "../store";
-import LoadingButton from "@mui/lab/LoadingButton";
+import DialogTransition from "./DialogTransition";
 
 const AddDataKeyDialog = () => {
   const { showAddDataKeyDialog, closeAddDataKeyDialog, addDataKey } =
@@ -32,7 +32,11 @@ const AddDataKeyDialog = () => {
   };
 
   return (
-    <Dialog onClose={onClose} open={showAddDataKeyDialog}>
+    <Dialog
+      onClose={onClose}
+      open={showAddDataKeyDialog}
+      TransitionComponent={DialogTransition}
+    >
       <DialogTitle>New Life Attribute</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField

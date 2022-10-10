@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Button, Typography } from "@mui/material";
 import moment from "moment";
 import React from "react";
 import useStore from "../store";
@@ -48,19 +48,23 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
           sx={{ display: "flex", flexDirection: "row" }}
         >
           {weekInMonth.map((dayInWeek, dayNum) => (
-            <Box
+            <Button
               key={`month_${month}_week_${weekNum}_day_${dayNum}`}
+              size="small"
               sx={{
                 display: "flex",
                 flexDirection: "column",
-                width: DAY_WIDTH,
                 height: DAY_WIDTH,
+                width: DAY_WIDTH,
+                maxWidth: DAY_WIDTH,
+                minWidth: 0,
                 justifyContent: "center",
                 alignItems: "center",
+                borderRadius: "50%",
               }}
             >
               {renderDayContent(dayInWeek.day)}
-            </Box>
+            </Button>
           ))}
         </Box>
       ))}

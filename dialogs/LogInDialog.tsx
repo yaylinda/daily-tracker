@@ -3,13 +3,18 @@ import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import React from "react";
 import useStore from "../store";
+import DialogTransition from "./DialogTransition";
 
 const LogInDialog = () => {
   const { showLoginDialog, closeLoginDialog, isAuthed, isAnon, signIn } =
     useStore();
 
   return (
-    <Dialog onClose={closeLoginDialog} open={showLoginDialog}>
+    <Dialog
+      onClose={closeLoginDialog}
+      open={showLoginDialog}
+      TransitionComponent={DialogTransition}
+    >
       <DialogTitle>{isAnon ? "Link Account" : "Log In Options"}</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <Button

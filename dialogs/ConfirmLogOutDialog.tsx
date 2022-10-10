@@ -9,6 +9,7 @@ import {
   Typography,
 } from "@mui/material";
 import useStore from "../store";
+import DialogTransition from "./DialogTransition";
 
 interface ConfirmLogOutDialogProps {
   open: boolean;
@@ -19,7 +20,11 @@ const ConfirmLogOutDialog = ({ open, onClose }: ConfirmLogOutDialogProps) => {
   const { isAnon, signOut } = useStore();
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog
+      open={open}
+      onClose={onClose}
+      TransitionComponent={DialogTransition}
+    >
       <DialogTitle>Logout</DialogTitle>
       <DialogContent>
         {isAnon && (
