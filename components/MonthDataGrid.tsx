@@ -18,25 +18,52 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
     [year, month]
   );
 
-  const data = useStore(
-    (state) => new Set([...(state.yearDataMap[year]?.[dataKeyId] || [])])
-  );
+  const { data, openDayDataDialog } = useStore((state) => ({
+    data: new Set([...(state.yearDataMap[year]?.[dataKeyId] || [])]),
+    openDayDataDialog: state.openDayDataDialog,
+  }));
 
-  const renderDayContent = (day: number) => {
-    if (day < 0) {
-      return <Typography variant="body2">{""}</Typography>;
-    }
+  const renderDay = (weekNum: number, dayInWeekNum: number, day: number) => {
     const dateKey = getDateKey({ year, month, day });
     const hasData = data.has(dateKey);
     const dayMoment = moment(new Date(year, month, day));
     const isToday = dayMoment.isSame(moment(), "day");
+
+    const dayContent =
+      day < 0 ? (
+        <Typography variant="body2">{""}</Typography>
+      ) : (
+        <Typography
+          variant="body2"
+          color={
+            hasData ? "green" : isToday ? colors.TEXT : colors.LIGHTER_TEXT
+          }
+        >
+          {day}
+        </Typography>
+      );
+
     return (
-      <Typography
-        variant="body2"
-        color={hasData ? "green" : isToday ? colors.TEXT : colors.LIGHTER_TEXT}
+      <Button
+        key={`month_${month}_week_${weekNum}_day_${dayInWeekNum}`}
+        size="small"
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: DAY_WIDTH,
+          width: DAY_WIDTH,
+          maxWidth: DAY_WIDTH,
+          minWidth: 0,
+          justifyContent: "center",
+          alignItems: "center",
+          borderRadius: "50%",
+        }}
+        onClick={() =>
+          openDayDataDialog(dataKeyId, { year, month, day }, hasData)
+        }
       >
-        {day}
-      </Typography>
+        {dayContent}
+      </Button>
     );
   };
 
@@ -47,25 +74,9 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
           key={`month_${month}_week_${weekNum}`}
           sx={{ display: "flex", flexDirection: "row" }}
         >
-          {weekInMonth.map((dayInWeek, dayNum) => (
-            <Button
-              key={`month_${month}_week_${weekNum}_day_${dayNum}`}
-              size="small"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                height: DAY_WIDTH,
-                width: DAY_WIDTH,
-                maxWidth: DAY_WIDTH,
-                minWidth: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                borderRadius: "50%",
-              }}
-            >
-              {renderDayContent(dayInWeek.day)}
-            </Button>
-          ))}
+          {weekInMonth.map((dayInWeek, dayNum) =>
+            renderDay(weekNum, dayNum, dayInWeek.day)
+          )}
         </Box>
       ))}
     </Box>

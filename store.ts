@@ -1,4 +1,5 @@
 import { OAuthCredential, User } from "firebase/auth";
+import produce from "immer";
 import { uniq } from "lodash";
 import moment from "moment";
 import create from "zustand";
@@ -8,9 +9,10 @@ import {
   signInWithGoogle,
   signOutAsync,
 } from "./auth";
-import { addDataKey, fetchUserData } from "./database";
+import { addDataKey, addDayData, fetchUserData } from "./database";
 import { DataKey, DayDate, SignInResult, YearDataMap } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
+import { getDateKey } from "./utils/monthGridUtil";
 
 interface StoreState {
   loading: boolean;
@@ -49,7 +51,14 @@ interface StoreState {
   closeAddDataKeyDialog: () => void;
 
   showDayDataDialog: boolean;
-  openDayDataDialog: () => void;
+  dayDataDialogDataKeyId: string | null;
+  dayDataDialogDayDate: DayDate | null;
+  dayDataDialogValue: boolean;
+  openDayDataDialog: (
+    dataKeyId: string,
+    dayDate: DayDate,
+    value: boolean
+  ) => void;
   closeDayDataDialog: () => void;
 }
 
@@ -89,15 +98,16 @@ const useStore = create<StoreState>()((set, get) => ({
 
     let dataKeys: DataKey[] = [];
     let yearData: { [dataKeyId in string]: string[] } = {};
+
     if (user?.uid) {
       // If the user exists, fetch user data
       const userData = await fetchUserData(user.uid, get().year);
-
       dataKeys = userData.dataKeys;
 
       if (userData.userYearData) {
         yearData = Object.keys(userData.userYearData).reduce((prev, curr) => {
           const dates = userData.userYearData![curr] || {};
+          // NOTE: For now, we only care about where days is true
           prev[curr] = uniq(Object.keys(dates));
           return prev;
         }, {} as { [dataKeyId in string]: string[] });
@@ -108,7 +118,6 @@ const useStore = create<StoreState>()((set, get) => ({
     set(
       (state) =>
         ({
-          ...state,
           loading: false,
           user,
           isAuthed: user != null,
@@ -129,7 +138,6 @@ const useStore = create<StoreState>()((set, get) => ({
     const dataKeyId = await addDataKey(get().user!.uid, dataKeyLabel);
 
     set((state) => ({
-      ...state,
       dataKeys: [...state.dataKeys, { id: dataKeyId, label: dataKeyLabel }],
       showAddDataKeyDialog: false,
     }));
@@ -139,8 +147,31 @@ const useStore = create<StoreState>()((set, get) => ({
   },
 
   yearDataMap: {},
-  addDayData: (dataKeyId: string, dayDate: DayDate, value: boolean) => {
-    // TODO - implement saving to firebase
+  addDayData: async (dataKeyId: string, dayDate: DayDate, value: boolean) => {
+    await addDayData(get().user!.uid, dataKeyId, dayDate, value);
+    set((state) => ({
+      yearDataMap: produce(get().yearDataMap, (draft) => {
+        if (!draft[get().year]) {
+          draft[get().year] = {};
+        }
+
+        if (!draft[get().year][dataKeyId]) {
+          draft[get().year][dataKeyId] = [];
+        }
+
+        if (value) {
+          draft[get().year][dataKeyId].push(getDateKey(dayDate));
+        } else {
+          draft[get().year][dataKeyId] = draft[get().year][dataKeyId].filter(
+            (dateKey) => dateKey !== getDateKey(dayDate)
+          );
+        }
+      }),
+      showDayDataDialog: false,
+      dayDataDialogDataKeyId: null,
+      dayDataDialogDayDate: null,
+      dayDataDialogValue: false,
+    }));
   },
   deleteDayData: (dayDataId: string) => {
     // TODO - implement deleting from firebase
@@ -185,7 +216,6 @@ const useStore = create<StoreState>()((set, get) => ({
       set(
         (state) =>
           ({
-            ...state,
             idToken: result.oAuthCredential?.idToken || null,
             accessToken: result.oAuthCredential?.accessToken || null,
             user: result.userCredential.user,
@@ -209,7 +239,6 @@ const useStore = create<StoreState>()((set, get) => ({
     set(
       (state) =>
         ({
-          ...state,
           idToken: null,
           accessToken: null,
           user: null,
@@ -245,7 +274,6 @@ const useStore = create<StoreState>()((set, get) => ({
     set(
       (state) =>
         ({
-          ...state,
           idToken: oAuthCredential.idToken,
           accessToken: oAuthCredential.accessToken,
           isAuthed: true,
@@ -257,30 +285,51 @@ const useStore = create<StoreState>()((set, get) => ({
   year: moment().year(),
   previousYear: () => {
     // TODO - fetch data for new year
-    set((state) => ({ ...state, year: state.year - 1 } as StoreState));
+    set((state) => ({ year: state.year - 1 } as StoreState));
   },
   nextYear: () => {
     // TODO - fetch data for new year
-    set((state) => ({ ...state, year: state.year + 1 } as StoreState));
+    set((state) => ({ year: state.year + 1 } as StoreState));
   },
 
   showLoginDialog: false,
   openLoginDialog: () =>
-    set((state) => ({ ...state, showLoginDialog: true } as StoreState)),
+    set((state) => ({ showLoginDialog: true } as StoreState)),
   closeLoginDialog: () =>
-    set((state) => ({ ...state, showLoginDialog: false } as StoreState)),
+    set((state) => ({ showLoginDialog: false } as StoreState)),
 
   showAddDataKeyDialog: false,
   openAddDataKeyDialog: () =>
-    set((state) => ({ ...state, showAddDataKeyDialog: true } as StoreState)),
+    set((state) => ({ showAddDataKeyDialog: true } as StoreState)),
   closeAddDataKeyDialog: () =>
-    set((state) => ({ ...state, showAddDataKeyDialog: false } as StoreState)),
+    set((state) => ({ showAddDataKeyDialog: false } as StoreState)),
 
   showDayDataDialog: false,
-  openDayDataDialog: () =>
-    set((state) => ({ ...state, showDayDataDialog: true } as StoreState)),
-  closeDayDataDialog: () =>
-    set((state) => ({ ...state, showDayDataDialog: false } as StoreState)),
+  dayDataDialogDataKeyId: null,
+  dayDataDialogDayDate: null,
+  dayDataDialogValue: false,
+  openDayDataDialog: (dataKeyId: string, dayDate: DayDate, value: boolean) => {
+    set(
+      (state) =>
+        ({
+          showDayDataDialog: true,
+          dayDataDialogDataKeyId: dataKeyId,
+          dayDataDialogDayDate: dayDate,
+          dayDataDialogValue: value,
+        } as StoreState)
+    );
+  },
+  closeDayDataDialog: () => {
+    set(
+      (state) =>
+        ({
+          showDayDataDialog: false,
+          dayDataDialogDataKeyId: null,
+          dayDataDialogDayDate: null,
+          dayDataDialogValue: false,
+        } as StoreState)
+    );
+  },
 }));
 
 export default useStore;

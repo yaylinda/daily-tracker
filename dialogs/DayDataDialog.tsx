@@ -1,24 +1,37 @@
 import { Dialog, DialogContent, Switch } from "@mui/material";
+import invariant from "invariant";
 import React from "react";
 import useStore from "../store";
-import { DataKey, DayDate } from "../types";
 import DialogActionButtons from "./dialogComponents/DialogActionButtons";
 import DialogTransition from "./dialogComponents/DialogTransition";
 
-interface DayDataDialogProps {
-  dataKey: DataKey;
-  dayDate: DayDate;
-  value: boolean;
-}
+const DayDataDialog = () => {
+  const {
+    showDayDataDialog,
+    dayDataDialogDataKeyId,
+    dayDataDialogDayDate,
+    dayDataDialogValue,
+    closeDayDataDialog,
+    addDayData,
+  } = useStore();
 
-const DayDataDialog = ({ dataKey, dayDate, value }: DayDataDialogProps) => {
-  const { showDayDataDialog, closeDayDataDialog, addDayData } = useStore();
-  const [newValue, setNewValue] = React.useState<boolean>(value);
+  const [newValue, setNewValue] = React.useState<boolean>(dayDataDialogValue);
   const [loading, setLoading] = React.useState<boolean>(false);
 
+  React.useEffect(() => {
+    if (showDayDataDialog) {
+      setLoading(false);
+      setNewValue(dayDataDialogValue);
+    }
+  }, [showDayDataDialog, dayDataDialogValue]);
+
   const submit = () => {
+    invariant(
+      dayDataDialogDataKeyId !== null && dayDataDialogDayDate !== null,
+      "dataKeyId and dayDate must not be null"
+    );
     setLoading(true);
-    addDayData(dataKey.id, dayDate, newValue);
+    addDayData(dayDataDialogDataKeyId, dayDataDialogDayDate, newValue);
   };
 
   const onClose = () => {

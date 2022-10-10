@@ -3,8 +3,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  DocumentReference,
-  getDoc,
   getDocs,
   getFirestore,
   query,
@@ -12,7 +10,7 @@ import {
   where,
 } from "firebase/firestore";
 import app from "./firebase";
-import { DataKey, DayDate, UserData, UserYearData } from "./types";
+import { DataKey, DayData, DayDate, UserData, UserYearData } from "./types";
 import { getDateKey } from "./utils/monthGridUtil";
 
 // The firestore db object
@@ -34,24 +32,8 @@ export const fetchUserData = async (
   year: number
 ): Promise<UserData> => {
   const dataKeys = await getDataKeys(userId);
-
-  const yearDataRef = doc(db, userId, `${year}`);
-  const userYearData = await fetchDocFromRef<UserYearData>(yearDataRef);
-
+  const userYearData = await getDayData(userId, year);
   return { dataKeys, userYearData };
-};
-
-const fetchDocFromRef = async <T>(
-  ref: DocumentReference
-): Promise<T | null> => {
-  const snapshot = await getDoc(ref);
-
-  if (!snapshot.exists()) {
-    console.log("snapshot doesnt exist");
-    return null;
-  }
-
-  return snapshot.data() as T;
 };
 
 /**************************************
@@ -97,7 +79,6 @@ export const addDataKey = async (userId: string, dataKeyLabel: string) => {
 
 /**
  *
- * @param userId
  * @param dataKeyId
  * @returns
  */
@@ -106,8 +87,38 @@ export const deleteDataKey = async (dataKeyId: string) => {
 };
 
 /**************************************
- * DAY DATA: ADD / DELETE
+ * DAY DATA
  **************************************/
+
+/**
+ *
+ * @param userId
+ * @returns
+ */
+export const getDayData = async (
+  userId: string,
+  year: number
+): Promise<UserYearData> => {
+  const userCollection = collection(db, userId);
+  const dayDataQuery = query(userCollection, where("year", "==", year));
+  const dayDataQuerySnapshot = await getDocs(dayDataQuery);
+
+  const dayData: DayData[] = [];
+  dayDataQuerySnapshot.forEach((doc) => {
+    dayData.push(doc.data() as DayData);
+  });
+
+  return dayData.reduce((prev, curr) => {
+    if (!prev[curr.dataKeyId]) {
+      prev[curr.dataKeyId] = {};
+    }
+    // NOTE: For now, we only care about where days is true
+    if (curr.value) {
+      prev[curr.dataKeyId][curr.dateKey] = { value: curr.value };
+    }
+    return prev;
+  }, {} as UserYearData);
+};
 
 /**
  *
@@ -119,36 +130,17 @@ export const deleteDataKey = async (dataKeyId: string) => {
 export const addDayData = async (
   userId: string,
   dataKeyId: string,
-  dayDate: DayDate
+  dayDate: DayDate,
+  value: boolean
 ) => {
-  const ref = doc(
-    db,
-    userId,
-    `${dayDate.year}`,
+  const userCollection = collection(db, userId);
+  const dateKey = getDateKey(dayDate);
+  const docRef = doc(userCollection, `${dataKeyId}_${dateKey}`);
+  const dayData: DayData = {
+    ...dayDate,
     dataKeyId,
-    getDateKey(dayDate)
-  );
-  return await setDoc(ref, { value: true });
-};
-
-/**
- *
- * @param userId
- * @param dataKeyId
- * @param dayDate
- * @returns
- */
-export const deleteDayData = async (
-  userId: string,
-  dataKeyId: string,
-  dayDate: DayDate
-) => {
-  const ref = doc(
-    db,
-    userId,
-    `${dayDate.year}`,
-    dataKeyId,
-    getDateKey(dayDate)
-  );
-  return await deleteDoc(ref);
+    value,
+    dateKey,
+  };
+  await setDoc(docRef, dayData);
 };

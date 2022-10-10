@@ -15,6 +15,7 @@ import MonthLabelRow from "../components/MonthLabelRow";
 import UserAvatar from "../components/UserAvatar";
 import YearDataGrid from "../components/YearDataGrid";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
+import DayDataDialog from "../dialogs/DayDataDialog";
 import LogInDialog from "../dialogs/LogInDialog";
 import useStore from "../store";
 import theme, { colors } from "../theme";
@@ -174,6 +175,7 @@ const Home: NextPage = () => {
       )}
       <LogInDialog />
       <AddDataKeyDialog />
+      <DayDataDialog />
     </ThemeProvider>
   );
 };

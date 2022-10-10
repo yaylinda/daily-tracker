@@ -7,7 +7,7 @@ export interface SignInResult {
 
 export interface DayDate {
   year: number;
-  month: number;
+  month: number; // [0, 11] -> [Jan, Dec]
   day: number;
 }
 
@@ -16,9 +16,9 @@ export interface DayInMonth extends DayDate {
 }
 
 export interface DayData extends DayDate {
-  id: string;
   dataKeyId: string;
-  value: boolean | number | string;
+  value: boolean;
+  dateKey: string;
 }
 
 export interface DataKey {
