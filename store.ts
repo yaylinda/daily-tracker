@@ -8,16 +8,17 @@ import {
   signInWithGoogle,
   signOutAsync,
 } from "./auth";
-import { fetchUserData } from "./database";
+import { addDataKey, fetchUserData } from "./database";
 import { DataKey, YearDataMap, SignInResult } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
+import { v4 as uuidv4 } from "uuid";
 
 interface StoreState {
   loading: boolean;
   init: () => void;
 
   dataKeys: DataKey[];
-  addDataKey: (displayName: string) => void;
+  addDataKey: (dataKeyLabel: string) => void;
   deleteDataKey: (dataKeyId: string) => void;
 
   yearDataMap: YearDataMap;
@@ -95,7 +96,7 @@ const useStore = create<StoreState>()((set, get) => ({
       const userData = await fetchUserData(user.uid, get().year);
 
       if (userData.dataKeys) {
-        dataKeys = Object.values(userData.dataKeys);
+        dataKeys = userData.dataKeys;
       }
       if (userData.userYearData) {
         yearData = Object.keys(userData.userYearData).reduce((prev, curr) => {
@@ -127,8 +128,14 @@ const useStore = create<StoreState>()((set, get) => ({
   },
 
   dataKeys: [],
-  addDataKey: (displayName: string) => {
-    // TODO - implement saving to firebase
+  addDataKey: async (dataKeyLabel: string) => {
+    const dataKeyId = await addDataKey(get().user!.uid, dataKeyLabel);
+
+    set((state) => ({
+      ...state,
+      dataKeys: [...state.dataKeys, { id: dataKeyId, label: dataKeyLabel }],
+      showAddDataKeyDialog: false,
+    }));
   },
   deleteDataKey: (dataKeyId: string) => {
     // TODO - implement deleting from firebase

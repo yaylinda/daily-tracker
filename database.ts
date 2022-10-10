@@ -1,19 +1,24 @@
 import {
+  addDoc,
+  collection,
   deleteDoc,
   doc,
   DocumentReference,
   getDoc,
+  getDocs,
   getFirestore,
+  query,
   setDoc,
+  where,
 } from "firebase/firestore";
 import app from "./firebase";
-import { DataKey, DataKeys, DayDate, UserData, UserYearData } from "./types";
+import { DataKey, DayDate, UserData, UserYearData } from "./types";
 import { getDateKey } from "./utils/monthGridUtil";
 
 // The firestore db object
 const db = getFirestore(app);
 
-const DATA_KEYS_COLLECTION = "data_keys";
+const dataKeysCollection = collection(db, "data_keys");
 
 /**************************************
  * FETCH USER DATA
@@ -28,8 +33,7 @@ export const fetchUserData = async (
   userId: string,
   year: number
 ): Promise<UserData> => {
-  const dataKeysRef = doc(db, userId, DATA_KEYS_COLLECTION);
-  const dataKeys = await fetchDocFromRef<DataKeys>(dataKeysRef);
+  const dataKeys = await getDataKeys(userId);
 
   const yearDataRef = doc(db, userId, `${year}`);
   const userYearData = await fetchDocFromRef<UserYearData>(yearDataRef);
@@ -43,6 +47,7 @@ const fetchDocFromRef = async <T>(
   const snapshot = await getDoc(ref);
 
   if (!snapshot.exists()) {
+    console.log("snapshot doesnt exist");
     return null;
   }
 
@@ -50,18 +55,44 @@ const fetchDocFromRef = async <T>(
 };
 
 /**************************************
- * DATA KEYS: ADD / DELETE
+ * DATA KEYS
  **************************************/
 
 /**
  *
  * @param userId
- * @param dataKey
  * @returns
  */
-export const addDataKey = async (userId: string, dataKey: DataKey) => {
-  const ref = doc(db, userId, DATA_KEYS_COLLECTION, dataKey.id);
-  return await setDoc(ref, dataKey);
+export const getDataKeys = async (userId: string): Promise<DataKey[]> => {
+  const dataKeysQuery = query(
+    dataKeysCollection,
+    where("userId", "==", userId)
+  );
+  const dataKeysQuerySnapshot = await getDocs(dataKeysQuery);
+
+  const dataKeys: DataKey[] = [];
+  dataKeysQuerySnapshot.forEach((doc) => {
+    dataKeys.push({
+      id: doc.id,
+      label: doc.data().label,
+    });
+  });
+
+  return dataKeys;
+};
+
+/**
+ *
+ * @param userId
+ * @param dataKeyLabel
+ * @returns
+ */
+export const addDataKey = async (userId: string, dataKeyLabel: string) => {
+  const newDataKey = await addDoc(dataKeysCollection, {
+    userId,
+    label: dataKeyLabel,
+  });
+  return newDataKey.id;
 };
 
 /**
@@ -70,9 +101,8 @@ export const addDataKey = async (userId: string, dataKey: DataKey) => {
  * @param dataKeyId
  * @returns
  */
-export const deleteDataKey = async (userId: string, dataKeyId: string) => {
-  const ref = doc(db, userId, DATA_KEYS_COLLECTION, dataKeyId);
-  return await deleteDoc(ref);
+export const deleteDataKey = async (dataKeyId: string) => {
+  return await deleteDoc(doc(dataKeysCollection, dataKeyId));
 };
 
 /**************************************
