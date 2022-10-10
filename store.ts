@@ -9,9 +9,8 @@ import {
   signOutAsync,
 } from "./auth";
 import { addDataKey, fetchUserData } from "./database";
-import { DataKey, YearDataMap, SignInResult } from "./types";
+import { DataKey, DayDate, SignInResult, YearDataMap } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
-import { v4 as uuidv4 } from "uuid";
 
 interface StoreState {
   loading: boolean;
@@ -22,12 +21,7 @@ interface StoreState {
   deleteDataKey: (dataKeyId: string) => void;
 
   yearDataMap: YearDataMap;
-  addDayData: (
-    dataKeyId: string,
-    year: number,
-    month: number,
-    day: number
-  ) => void;
+  addDayData: (dataKeyId: string, dayDate: DayDate, value: boolean) => void;
   deleteDayData: (dayDataId: string) => void;
 
   leftScroll: number;
@@ -53,6 +47,10 @@ interface StoreState {
   showAddDataKeyDialog: boolean;
   openAddDataKeyDialog: () => void;
   closeAddDataKeyDialog: () => void;
+
+  showDayDataDialog: boolean;
+  openDayDataDialog: () => void;
+  closeDayDataDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
@@ -141,7 +139,7 @@ const useStore = create<StoreState>()((set, get) => ({
   },
 
   yearDataMap: {},
-  addDayData: (dataKeyId: string, year: number, month: number, day: number) => {
+  addDayData: (dataKeyId: string, dayDate: DayDate, value: boolean) => {
     // TODO - implement saving to firebase
   },
   deleteDayData: (dayDataId: string) => {
@@ -277,6 +275,12 @@ const useStore = create<StoreState>()((set, get) => ({
     set((state) => ({ ...state, showAddDataKeyDialog: true } as StoreState)),
   closeAddDataKeyDialog: () =>
     set((state) => ({ ...state, showAddDataKeyDialog: false } as StoreState)),
+
+  showDayDataDialog: false,
+  openDayDataDialog: () =>
+    set((state) => ({ ...state, showDayDataDialog: true } as StoreState)),
+  closeDayDataDialog: () =>
+    set((state) => ({ ...state, showDayDataDialog: false } as StoreState)),
 }));
 
 export default useStore;

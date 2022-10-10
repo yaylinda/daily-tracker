@@ -3,7 +3,7 @@ import NoAccountsIcon from "@mui/icons-material/NoAccounts";
 import { Button, Dialog, DialogContent, DialogTitle } from "@mui/material";
 import React from "react";
 import useStore from "../store";
-import DialogTransition from "./DialogTransition";
+import DialogTransition from "./dialogComponents/DialogTransition";
 
 const LogInDialog = () => {
   const { showLoginDialog, closeLoginDialog, isAuthed, isAnon, signIn } =

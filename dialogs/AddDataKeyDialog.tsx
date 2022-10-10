@@ -1,17 +1,8 @@
-import CheckIcon from "@mui/icons-material/Check";
-import CloseIcon from "@mui/icons-material/Close";
-import LoadingButton from "@mui/lab/LoadingButton";
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-  TextField,
-} from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, TextField } from "@mui/material";
 import React from "react";
 import useStore from "../store";
-import DialogTransition from "./DialogTransition";
+import DialogActionButtons from "./dialogComponents/DialogActionButtons";
+import DialogTransition from "./dialogComponents/DialogTransition";
 
 const AddDataKeyDialog = () => {
   const { showAddDataKeyDialog, closeAddDataKeyDialog, addDataKey } =
@@ -38,26 +29,20 @@ const AddDataKeyDialog = () => {
       TransitionComponent={DialogTransition}
     >
       <DialogTitle>New Life Attribute</DialogTitle>
-      <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+      <DialogContent>
         <TextField
           variant="standard"
           value={dataKeyLabel}
           onChange={(event) => setDataKeyLabel(event.target.value)}
         />
       </DialogContent>
-      <DialogActions sx={{ justifyContent: "space-between" }}>
-        <IconButton sx={{ color: "red" }} onClick={onClose}>
-          <CloseIcon fontSize="large" />
-        </IconButton>
-        <LoadingButton
-          sx={{ color: "green" }}
-          onClick={submit}
-          disabled={!dataKeyLabel}
-          loading={loading}
-        >
-          <CheckIcon fontSize="large" />
-        </LoadingButton>
-      </DialogActions>
+      <DialogActionButtons
+        withLoading
+        loading={loading}
+        confirmDisabled={!dataKeyLabel}
+        onCancelClick={onClose}
+        onConfirmClick={submit}
+      />
     </Dialog>
   );
 };
