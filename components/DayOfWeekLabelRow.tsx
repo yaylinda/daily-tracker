@@ -1,17 +1,11 @@
 import { Box, Typography } from "@mui/material";
-import moment from "moment";
 import React from "react";
 import { colors } from "../theme";
 import { DAY_WIDTH } from "../utils/constants";
 import { getDayOfWeekLabels } from "../utils/monthGridUtil";
 
-interface DayOfWeekLabelRowProps {
-  month: number;
-}
-
-const DayOfWeekLabelRow = ({ month }: DayOfWeekLabelRowProps) => {
+const DayOfWeekLabelRow = () => {
   const dayOfWeekLabels = React.useMemo(() => getDayOfWeekLabels(), []);
-  const currentMonth = moment().month();
 
   return (
     <Box sx={{ display: "flex", flexDirection: "row" }}>
@@ -27,10 +21,7 @@ const DayOfWeekLabelRow = ({ month }: DayOfWeekLabelRowProps) => {
             alignItems: "center",
           }}
         >
-          <Typography
-            variant="overline"
-            color={month < currentMonth ? colors.LIGHTER_TEXT : colors.TEXT}
-          >
+          <Typography variant="overline" color={colors.TEXT}>
             {dow}
           </Typography>
         </Box>

@@ -34,6 +34,17 @@ const Home: NextPage = () => {
     init();
   }, []);
 
+  const addDataKeyButton = (
+    <Button
+      variant="contained"
+      startIcon={<AddCircleIcon />}
+      sx={{ marginTop: 5 }}
+      onClick={openAddDataKeyDialog}
+    >
+      Add Life Attribute
+    </Button>
+  );
+
   /**
    * Header Component
    */
@@ -118,6 +129,7 @@ const Home: NextPage = () => {
                 dataKey={dataKey}
               />
             ))}
+            {addDataKeyButton}
           </Stack>
         </Box>
       );
@@ -137,14 +149,7 @@ const Home: NextPage = () => {
           This can be something like "Felt Happy", or "Exercised", or even "Got
           out of bed".
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddCircleIcon />}
-          sx={{ marginTop: 5 }}
-          onClick={openAddDataKeyDialog}
-        >
-          Add Life Attribute
-        </Button>
+        {addDataKeyButton}
       </Stack>
     );
   };

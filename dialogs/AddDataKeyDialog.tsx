@@ -11,15 +11,28 @@ import {
 } from "@mui/material";
 import React from "react";
 import useStore from "../store";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 const AddDataKeyDialog = () => {
   const { showAddDataKeyDialog, closeAddDataKeyDialog, addDataKey } =
     useStore();
 
   const [dataKeyLabel, setDataKeyLabel] = React.useState<string>("");
+  const [loading, setLoading] = React.useState<boolean>(false);
+
+  const submit = () => {
+    setLoading(true);
+    addDataKey(dataKeyLabel);
+  };
+
+  const onClose = () => {
+    setDataKeyLabel("");
+    setLoading(false);
+    closeAddDataKeyDialog();
+  };
 
   return (
-    <Dialog onClose={closeAddDataKeyDialog} open={showAddDataKeyDialog}>
+    <Dialog onClose={onClose} open={showAddDataKeyDialog}>
       <DialogTitle>New Life Attribute</DialogTitle>
       <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
         <TextField
@@ -29,16 +42,17 @@ const AddDataKeyDialog = () => {
         />
       </DialogContent>
       <DialogActions sx={{ justifyContent: "space-between" }}>
-        <IconButton sx={{ color: "red" }} onClick={closeAddDataKeyDialog}>
+        <IconButton sx={{ color: "red" }} onClick={onClose}>
           <CloseIcon fontSize="large" />
         </IconButton>
-        <IconButton
+        <LoadingButton
           sx={{ color: "green" }}
-          onClick={() => addDataKey(dataKeyLabel)}
+          onClick={submit}
           disabled={!dataKeyLabel}
+          loading={loading}
         >
           <CheckIcon fontSize="large" />
-        </IconButton>
+        </LoadingButton>
       </DialogActions>
     </Dialog>
   );

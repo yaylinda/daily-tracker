@@ -95,9 +95,8 @@ const useStore = create<StoreState>()((set, get) => ({
       // If the user exists, fetch user data
       const userData = await fetchUserData(user.uid, get().year);
 
-      if (userData.dataKeys) {
-        dataKeys = userData.dataKeys;
-      }
+      dataKeys = userData.dataKeys;
+
       if (userData.userYearData) {
         yearData = Object.keys(userData.userYearData).reduce((prev, curr) => {
           const dates = userData.userYearData![curr] || {};

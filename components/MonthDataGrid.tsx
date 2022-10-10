@@ -19,7 +19,7 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
   );
 
   const data = useStore(
-    (state) => state.yearDataMap[year]?.[dataKeyId] || new Set([])
+    (state) => new Set([...(state.yearDataMap[year]?.[dataKeyId] || [])])
   );
 
   const renderDayContent = (day: number) => {
@@ -29,11 +29,11 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
     const dateKey = getDateKey({ year, month, day });
     const hasData = data.has(dateKey);
     const dayMoment = moment(new Date(year, month, day));
-    const isBefore = dayMoment.isBefore(moment(), "day");
+    const isToday = dayMoment.isSame(moment(), "day");
     return (
       <Typography
         variant="body2"
-        color={hasData ? "green" : isBefore ? colors.LIGHTER_TEXT : colors.TEXT}
+        color={hasData ? "green" : isToday ? colors.TEXT : colors.LIGHTER_TEXT}
       >
         {day}
       </Typography>

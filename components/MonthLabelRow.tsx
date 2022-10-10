@@ -52,13 +52,10 @@ const MonthLabelRow = () => {
               gap: 1,
             }}
           >
-            <Typography
-              variant="subtitle2"
-              color={month < currentMonth ? colors.LIGHTER_TEXT : colors.TEXT}
-            >
+            <Typography variant="subtitle2" color={colors.TEXT}>
               {monthLabel}
             </Typography>
-            <DayOfWeekLabelRow month={month} />
+            <DayOfWeekLabelRow />
           </Box>
         ))}
       </Box>
