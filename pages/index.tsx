@@ -1,50 +1,27 @@
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import {
   AppBar,
-  Box,
   Button,
   LinearProgress,
-  Stack,
   ThemeProvider,
   Toolbar,
   Typography,
 } from "@mui/material";
 import type { NextPage } from "next";
 import React from "react";
-import MonthLabelRow from "../components/MonthLabelRow";
 import UserAvatar from "../components/UserAvatar";
-import YearDataGrid from "../components/YearDataGrid";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
 import DayDataDialog from "../dialogs/DayDataDialog";
 import LogInDialog from "../dialogs/LogInDialog";
+import YearGridLayout from "../layouts/YearGridLayout";
 import useStore from "../store";
 import theme, { colors } from "../theme";
 
 const Home: NextPage = () => {
-  const {
-    year,
-    dataKeys,
-    isAuthed,
-    loading,
-    init,
-    openLoginDialog,
-    openAddDataKeyDialog,
-  } = useStore();
+  const { isAuthed, loading, init, openLoginDialog } = useStore();
 
   React.useEffect(() => {
     init();
   }, []);
-
-  const addDataKeyButton = (
-    <Button
-      variant="contained"
-      startIcon={<AddCircleIcon />}
-      sx={{ marginTop: 5 }}
-      onClick={openAddDataKeyDialog}
-    >
-      Add Life Attribute
-    </Button>
-  );
 
   /**
    * Header Component
@@ -71,108 +48,10 @@ const Home: NextPage = () => {
     );
   };
 
-  /**
-   * Body content
-   */
-  const renderBody = () => {
-    if (!isAuthed) {
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 5,
-            width: "50%",
-          }}
-        >
-          <Typography variant="h2">
-            Track and visualize your years in booleans
-          </Typography>
-          <Typography>Sign in to get started!</Typography>
-        </Box>
-      );
-    }
-
-    return (
-      <>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            marginBottom: 5,
-          }}
-        >
-          <Typography variant="h1">{year}</Typography>
-        </Box>
-        {renderData()}
-      </>
-    );
-  };
-
-  const renderData = () => {
-    if (dataKeys.length) {
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            color: colors.TEXT,
-            gap: 2,
-          }}
-        >
-          <MonthLabelRow />
-          <Stack>
-            {dataKeys.map((dataKey) => (
-              <YearDataGrid
-                key={`${year}_${dataKey.id}`}
-                year={year}
-                dataKey={dataKey}
-              />
-            ))}
-            {addDataKeyButton}
-          </Stack>
-        </Box>
-      );
-    }
-
-    return (
-      <Stack sx={{ width: 400, alignSelf: "center" }}>
-        <Typography
-          variant="caption"
-          color={colors.LIGHTER_TEXT}
-          sx={{ marginBottom: 1 }}
-        >
-          Add a new Life Attribute to track daily that can be expressed as a
-          boolean (a "true" or "false" value).
-        </Typography>
-        <Typography variant="caption" color={colors.LIGHTER_TEXT}>
-          This can be something like "Felt Happy", or "Exercised", or even "Got
-          out of bed".
-        </Typography>
-        {addDataKeyButton}
-      </Stack>
-    );
-  };
-
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      {loading ? (
-        <LinearProgress />
-      ) : (
-        <Stack
-          sx={{
-            color: colors.TEXT,
-            marginTop: 10,
-            marginBottom: 10,
-            marginLeft: 5,
-            marginRight: 5,
-          }}
-        >
-          {renderBody()}
-        </Stack>
-      )}
+      {loading ? <LinearProgress /> : <YearGridLayout />}
       <LogInDialog />
       <AddDataKeyDialog />
       <DayDataDialog />
