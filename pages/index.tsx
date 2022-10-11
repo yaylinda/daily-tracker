@@ -1,7 +1,6 @@
 import {
   AppBar,
   Button,
-  LinearProgress,
   ThemeProvider,
   Toolbar,
   Typography,
@@ -12,7 +11,7 @@ import UserAvatar from "../components/UserAvatar";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
 import DayDataDialog from "../dialogs/DayDataDialog";
 import LogInDialog from "../dialogs/LogInDialog";
-import YearGridLayout from "../layouts/YearGridLayout";
+import SidebarLayout from "../layouts/SidebarLayout";
 import useStore from "../store";
 import theme, { colors } from "../theme";
 
@@ -29,8 +28,11 @@ const Home: NextPage = () => {
   const renderHeader = () => {
     return (
       <AppBar
-        position="static"
-        sx={{ backgroundColor: colors.SURFACE_BACKGROUND }}
+        position="fixed"
+        sx={{
+          backgroundColor: colors.SURFACE_BACKGROUND,
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
       >
         <Toolbar>
           <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1 }}>
@@ -51,7 +53,7 @@ const Home: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      {loading ? <LinearProgress /> : <YearGridLayout />}
+      <SidebarLayout />
       <LogInDialog />
       <AddDataKeyDialog />
       <DayDataDialog />

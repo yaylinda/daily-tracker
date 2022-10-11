@@ -41,6 +41,8 @@ interface StoreState {
   year: number;
   previousYear: () => void;
   nextYear: () => void;
+  month: number;
+  setMonth: (month: number) => void;
 
   showLoginDialog: boolean;
   openLoginDialog: () => void;
@@ -290,6 +292,10 @@ const useStore = create<StoreState>()((set, get) => ({
   nextYear: () => {
     // TODO - fetch data for new year
     set((state) => ({ year: state.year + 1 } as StoreState));
+  },
+  month: moment().month(),
+  setMonth: (month) => {
+    set({ month });
   },
 
   showLoginDialog: false,

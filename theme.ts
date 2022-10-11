@@ -12,12 +12,7 @@ const theme = createTheme({
     fontFamily: ["Roboto Mono"].join(","),
   },
   palette: {
-    background: {
-      paper: colors.BACKGROUND,
-    },
-    text: {
-      primary: colors.TEXT,
-    },
+    mode: "dark",
   },
 });
 
