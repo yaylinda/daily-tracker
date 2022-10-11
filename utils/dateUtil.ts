@@ -9,6 +9,10 @@ const PADDING_DAY = {
   day: -1,
 };
 
+const PADDING_WEEK = Array.from(Array(NUM_DAYS_IN_WEEK), (_, i) => ({
+  ...PADDING_DAY,
+}));
+
 /**
  *
  * @param year
@@ -37,10 +41,16 @@ export const getDaysInMonth = (year: number, month: number): DayInMonth[][] => {
     (_, i) => ({ ...PADDING_DAY })
   );
 
-  return chunk(
+  const chunks = chunk(
     [...daysBeforeMonth, ...daysInMonth, ...daysAfterMonth],
     NUM_DAYS_IN_WEEK
   );
+
+  if (chunks.length < 6) {
+    chunks.push(PADDING_WEEK);
+  }
+
+  return chunks;
 };
 
 /**

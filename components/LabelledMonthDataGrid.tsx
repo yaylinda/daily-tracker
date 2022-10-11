@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Stack, Typography } from "@mui/material";
 import useStore from "../store";
 import { DataKey } from "../types";
 import { stringToColor } from "../utils/colorUtil";
@@ -15,26 +15,29 @@ const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
   const color = stringToColor(dataKey.id);
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "row" }}>
+    <Stack>
       <Box
         sx={{
-          position: "relative",
-          width: DAY_WIDTH,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          width: MONTH_WIDTH,
+          height: DAY_WIDTH,
           backgroundColor: color,
           borderTopLeftRadius: 5,
-          borderBottomLeftRadius: 5,
+          borderTopRightRadius: 5,
+          border: `1px ${color} solid`,
+          borderBottom: "none",
+          transformOrigin: "bottom left",
+          transform: "rotate(-90deg)",
+          bottom: `-${MONTH_WIDTH + 2}px`,
+          position: "relative",
         }}
       >
         <Typography
+          noWrap
           variant="subtitle2"
-          sx={{
-            transform: "rotate(270deg)",
-            transformOrigin: "0 0",
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            width: MONTH_WIDTH,
-          }}
+          sx={{ paddingRight: 1, paddingLeft: 1 }}
         >
           {dataKey.label}
         </Typography>
@@ -44,6 +47,7 @@ const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
           display: "flex",
           flexDirection: "column",
           border: `1px ${color} solid`,
+          borderLeft: "none",
           borderTopRightRadius: 5,
           borderBottomRightRadius: 5,
         }}
@@ -51,7 +55,7 @@ const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
         <DayOfWeekLabelRow />
         <MonthDataGrid dataKeyId={dataKey.id} year={year} month={month} />
       </Box>
-    </Box>
+    </Stack>
   );
 };
 
