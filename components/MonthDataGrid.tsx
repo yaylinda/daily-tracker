@@ -47,6 +47,7 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
       <Button
         key={`month_${month}_week_${weekNum}_day_${dayInWeekNum}`}
         size="small"
+        disabled={day < 0}
         sx={{
           display: "flex",
           flexDirection: "column",

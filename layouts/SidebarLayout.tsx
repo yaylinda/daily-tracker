@@ -4,6 +4,7 @@ import {
   Divider,
   Drawer,
   Grid,
+  LinearProgress,
   List,
   ListItem,
   ListItemButton,
@@ -23,7 +24,8 @@ import { getMonthLabels } from "../utils/monthGridUtil";
 const drawerWidth = 240;
 
 const SidebarLayout = () => {
-  const { month, year, dataKeys, openAddDataKeyDialog, setMonth } = useStore();
+  const { loading, month, year, dataKeys, openAddDataKeyDialog, setMonth } =
+    useStore();
   const theme = useTheme();
   return (
     <>
@@ -73,13 +75,17 @@ const SidebarLayout = () => {
           <Typography variant="h2" sx={{ marginBottom: 5 }}>
             {moment().month(month).format("MMMM")} {year}
           </Typography>
-          <Grid container spacing={2}>
-            {dataKeys.map((dataKey) => (
-              <Grid item>
-                <LabelledMonthDataGrid dataKey={dataKey} />
-              </Grid>
-            ))}
-          </Grid>
+          {loading ? (
+            <LinearProgress />
+          ) : (
+            <Grid container spacing={2}>
+              {dataKeys.map((dataKey) => (
+                <Grid key={`${dataKey.id}_${year}_${month}`} item>
+                  <LabelledMonthDataGrid dataKey={dataKey} />
+                </Grid>
+              ))}
+            </Grid>
+          )}
         </Box>
       </Box>
     </>
