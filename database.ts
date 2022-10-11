@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import app from "./firebase";
 import { DataKey, DayData, DayDate, UserData, UserYearData } from "./types";
-import { getDateKey } from "./utils/monthGridUtil";
+import { getDateKey } from "./utils/dateUtil";
 
 // The firestore db object
 const db = getFirestore(app);

@@ -4,7 +4,7 @@ import React from "react";
 import useStore from "../store";
 import { colors } from "../theme";
 import { DAY_WIDTH } from "../utils/constants";
-import { getDateKey, getDaysInMonth } from "../utils/monthGridUtil";
+import { getDateKey, getDaysInMonth } from "../utils/dateUtil";
 
 export interface MonthDataGridProps {
   dataKeyId: string;

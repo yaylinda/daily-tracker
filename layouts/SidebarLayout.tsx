@@ -19,9 +19,9 @@ import moment from "moment";
 import LabelledMonthDataGrid from "../components/LabelledMonthDataGrid";
 import useStore from "../store";
 import { colors } from "../theme";
-import { getMonthLabels } from "../utils/monthGridUtil";
+import { getMonthLabels } from "../utils/dateUtil";
 
-const drawerWidth = 240;
+const drawerWidth = 200;
 
 const SidebarLayout = () => {
   const { loading, month, year, dataKeys, openAddDataKeyDialog, setMonth } =
@@ -78,7 +78,7 @@ const SidebarLayout = () => {
           {loading ? (
             <LinearProgress />
           ) : (
-            <Grid container spacing={2}>
+            <Grid container spacing={3}>
               {dataKeys.map((dataKey) => (
                 <Grid key={`${dataKey.id}_${year}_${month}`} item>
                   <LabelledMonthDataGrid dataKey={dataKey} />

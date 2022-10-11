@@ -4,7 +4,7 @@ import React from "react";
 import useStore from "../store";
 import { colors } from "../theme";
 import { MONTH_WIDTH } from "../utils/constants";
-import { getMonthLabels } from "../utils/monthGridUtil";
+import { getMonthLabels } from "../utils/dateUtil";
 import DataKeyCell from "./DataKeyCell";
 import DayOfWeekLabelRow from "./DayOfWeekLabelRow";
 

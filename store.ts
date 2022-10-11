@@ -12,7 +12,7 @@ import {
 import { addDataKey, addDayData, fetchUserData } from "./database";
 import { DataKey, DayDate, SignInResult, YearDataMap } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
-import { getDateKey } from "./utils/monthGridUtil";
+import { getDateKey } from "./utils/dateUtil";
 
 interface StoreState {
   loading: boolean;

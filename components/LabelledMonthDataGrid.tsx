@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import useStore from "../store";
 import { DataKey } from "../types";
+import { stringToColor } from "../utils/colorUtil";
 import { DAY_WIDTH, MONTH_WIDTH } from "../utils/constants";
 import DayOfWeekLabelRow from "./DayOfWeekLabelRow";
 import MonthDataGrid from "./MonthDataGrid";
@@ -11,13 +12,15 @@ interface LabelledMonthDataGridProps {
 
 const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
   const { month, year } = useStore();
+  const color = stringToColor(dataKey.id);
+
   return (
     <Box sx={{ display: "flex", flexDirection: "row" }}>
       <Box
         sx={{
           position: "relative",
           width: DAY_WIDTH,
-          backgroundColor: "orange",
+          backgroundColor: color,
           borderTopLeftRadius: 5,
           borderBottomLeftRadius: 5,
         }}
@@ -40,7 +43,7 @@ const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
         sx={{
           display: "flex",
           flexDirection: "column",
-          border: "1px orange solid",
+          border: `1px ${color} solid`,
           borderTopRightRadius: 5,
           borderBottomRightRadius: 5,
         }}

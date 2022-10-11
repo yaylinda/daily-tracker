@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material";
 import React from "react";
 import { colors } from "../theme";
 import { DAY_WIDTH } from "../utils/constants";
-import { getDayOfWeekLabels } from "../utils/monthGridUtil";
+import { getDayOfWeekLabels } from "../utils/dateUtil";
 
 const DayOfWeekLabelRow = () => {
   const dayOfWeekLabels = React.useMemo(() => getDayOfWeekLabels(), []);
