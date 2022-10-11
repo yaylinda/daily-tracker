@@ -16,10 +16,11 @@ import {
   useTheme,
 } from "@mui/material";
 import moment from "moment";
+import AddDataKeyGridItem from "../components/AddDataKeyGridItem";
 import LabelledMonthDataGrid from "../components/LabelledMonthDataGrid";
 import useStore from "../store";
 import { colors } from "../theme";
-import { DAY_WIDTH, MONTH_WIDTH } from "../utils/constants";
+import { DAY_WIDTH } from "../utils/constants";
 import { getMonthLabels } from "../utils/dateUtil";
 
 const drawerWidth = 200;
@@ -93,6 +94,15 @@ const SidebarLayout = () => {
                   <LabelledMonthDataGrid dataKey={dataKey} />
                 </Grid>
               ))}
+              <Grid
+                item
+                sx={{
+                  paddingLeft: `${DAY_WIDTH}px!important`,
+                  paddingTop: `${DAY_WIDTH}px`,
+                }}
+              >
+                <AddDataKeyGridItem />
+              </Grid>
             </Grid>
           )}
         </Box>

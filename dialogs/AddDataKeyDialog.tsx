@@ -11,6 +11,13 @@ const AddDataKeyDialog = () => {
   const [dataKeyLabel, setDataKeyLabel] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
 
+  React.useEffect(() => {
+    if (showAddDataKeyDialog) {
+      setLoading(false);
+      setDataKeyLabel("");
+    }
+  }, [showAddDataKeyDialog]);
+
   const submit = () => {
     setLoading(true);
     addDataKey(dataKeyLabel);
