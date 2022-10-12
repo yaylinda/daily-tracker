@@ -30,26 +30,38 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
     const isFalse = falseDates.has(dateKey);
     const dayMoment = moment(new Date(year, month, day));
     const isToday = dayMoment.isSame(moment(), "day");
+    const isFuture = dayMoment.isAfter(moment(), "day");
+    const hasData = isTrue || isFalse;
+
+    const textColor =
+      !hasData && isToday
+        ? "black"
+        : isFuture
+        ? colors.LIGHTER_TEXT
+        : colors.TEXT;
+
+    const backgroundColor = isTrue
+      ? "green"
+      : isFalse
+      ? "red"
+      : isToday
+      ? "yellow"
+      : undefined;
 
     const dayContent =
       day < 0 ? (
-        <Typography variant="body2">{""}</Typography>
+        <Typography>{""}</Typography>
       ) : (
-        <Typography
-          variant="body2"
-          color={isToday ? colors.TEXT : colors.LIGHTER_TEXT}
-        >
+        <Typography color={textColor} sx={{ fontSize: 10 }}>
           {day}
         </Typography>
       );
-
-    const color = isTrue ? "green" : isFalse ? "red" : undefined;
 
     return (
       <Button
         key={`month_${month}_week_${weekNum}_day_${dayInWeekNum}`}
         size="small"
-        disabled={day < 0}
+        disabled={day < 0 || isFuture}
         sx={{
           display: "flex",
           flexDirection: "column",
@@ -59,8 +71,8 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
           minWidth: 0,
           justifyContent: "center",
           alignItems: "center",
-          borderRadius: "50%",
-          backgroundColor: color,
+          borderRadius: 0,
+          backgroundColor: backgroundColor,
         }}
         onClick={() =>
           openDayDataDialog(dataKeyId, { year, month, day }, isTrue)
