@@ -1,4 +1,11 @@
 import { OAuthCredential, UserCredential } from "firebase/auth";
+import { FieldValue } from "firebase/firestore";
+
+export interface Auditable {
+  createdAt: FieldValue;
+  updatedAt: FieldValue;
+  deletedAt: FieldValue | null;
+}
 
 export interface SignInResult {
   oAuthCredential: OAuthCredential | null;
@@ -15,43 +22,41 @@ export interface DayInMonth extends DayDate {
   data?: DayData;
 }
 
-export interface DayData extends DayDate {
+export interface DayData extends DayDate, Auditable {
   dataKeyId: string;
   value: boolean;
   dateKey: string;
 }
 
-export interface DataKey {
+export interface DataKey extends Auditable {
   id: string;
   label: string;
 }
 
-/**
- * Example:
- * {
- *   'abc123' : ['2021-01-01', '2021-01-03']
- * }
- */
-export type YearData = { [dataKeyId in string]: string[] };
+export type DataKeyDateMap = { [dataKeyId in string]: Set<string> };
 
 /**
  * Example:
  * {
- *   2022: { 'abc123' : ['2022-01-01', '2022-01-03'] }
- *   2021: { 'abc123' : ['2021-01-01', '2021-01-03'] }
+ *   true: {
+ *     'abc123' : ['2021-01-01', '2021-01-03']
+ *   },
+ *   false: {
+ *     'abc123' : ['2021-01-01', '2021-01-03']
+ *   },
  * }
  */
+export type YearData = {
+  [valueStr in string]: DataKeyDateMap;
+};
+
 export type YearDataMap = {
   [year in number]: YearData;
 };
 
-/**************************************
- * Firestore Types
- *************************************/
-
 export interface UserData {
   dataKeys: DataKey[];
-  userYearData: UserYearData | null;
+  dayData: DayData[];
 }
 
 export type UserYearData = {

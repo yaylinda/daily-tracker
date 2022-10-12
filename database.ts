@@ -1,12 +1,14 @@
 import {
   addDoc,
   collection,
-  deleteDoc,
   doc,
   getDocs,
   getFirestore,
+  orderBy,
   query,
+  serverTimestamp,
   setDoc,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import app from "./firebase";
@@ -15,8 +17,6 @@ import { getDateKey } from "./utils/dateUtil";
 
 // The firestore db object
 const db = getFirestore(app);
-
-const dataKeysCollection = collection(db, "data_keys");
 
 /**************************************
  * FETCH USER DATA
@@ -32,13 +32,17 @@ export const fetchUserData = async (
   year: number
 ): Promise<UserData> => {
   const dataKeys = await getDataKeys(userId);
-  const userYearData = await getDayData(userId, year);
-  return { dataKeys, userYearData };
+  const dayData = await getDayData(userId, year);
+  return { dataKeys, dayData };
 };
 
 /**************************************
  * DATA KEYS
  **************************************/
+
+function getDataKeyCollection(userId: string) {
+  return collection(db, `${userId}_data_keys`);
+}
 
 /**
  *
@@ -46,17 +50,15 @@ export const fetchUserData = async (
  * @returns
  */
 export const getDataKeys = async (userId: string): Promise<DataKey[]> => {
-  const dataKeysQuery = query(
-    dataKeysCollection,
-    where("userId", "==", userId)
+  const dataKeysQuerySnapshot = await getDocs(
+    query(getDataKeyCollection(userId), orderBy("createdAt"))
   );
-  const dataKeysQuerySnapshot = await getDocs(dataKeysQuery);
 
   const dataKeys: DataKey[] = [];
   dataKeysQuerySnapshot.forEach((doc) => {
     dataKeys.push({
+      ...(doc.data() as Omit<DataKey, "id">),
       id: doc.id,
-      label: doc.data().label,
     });
   });
 
@@ -69,12 +71,21 @@ export const getDataKeys = async (userId: string): Promise<DataKey[]> => {
  * @param dataKeyLabel
  * @returns
  */
-export const addDataKey = async (userId: string, dataKeyLabel: string) => {
-  const newDataKey = await addDoc(dataKeysCollection, {
-    userId,
+export const addDataKey = async (
+  userId: string,
+  dataKeyLabel: string
+): Promise<DataKey> => {
+  const inputDataKey: Omit<DataKey, "id"> = {
     label: dataKeyLabel,
-  });
-  return newDataKey.id;
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    deletedAt: null,
+  };
+  const newDataKey = await addDoc(getDataKeyCollection(userId), inputDataKey);
+  return {
+    ...inputDataKey,
+    id: newDataKey.id,
+  };
 };
 
 /**
@@ -82,13 +93,18 @@ export const addDataKey = async (userId: string, dataKeyLabel: string) => {
  * @param dataKeyId
  * @returns
  */
-export const deleteDataKey = async (dataKeyId: string) => {
-  return await deleteDoc(doc(dataKeysCollection, dataKeyId));
+export const deleteDataKey = async (userId: string, dataKeyId: string) => {
+  const docRef = doc(getDataKeyCollection(userId), dataKeyId);
+  return await updateDoc(docRef, { deletedAt: serverTimestamp() });
 };
 
 /**************************************
  * DAY DATA
  **************************************/
+
+function getUserDayDataCollection(userId: string, year: number) {
+  return collection(db, `${userId}_${year}`);
+}
 
 /**
  *
@@ -98,26 +114,17 @@ export const deleteDataKey = async (dataKeyId: string) => {
 export const getDayData = async (
   userId: string,
   year: number
-): Promise<UserYearData> => {
-  const userCollection = collection(db, userId);
-  const dayDataQuery = query(userCollection, where("year", "==", year));
-  const dayDataQuerySnapshot = await getDocs(dayDataQuery);
+): Promise<DayData[]> => {
+  const dayDataQuerySnapshot = await getDocs(
+    getUserDayDataCollection(userId, year)
+  );
 
   const dayData: DayData[] = [];
   dayDataQuerySnapshot.forEach((doc) => {
     dayData.push(doc.data() as DayData);
   });
 
-  return dayData.reduce((prev, curr) => {
-    if (!prev[curr.dataKeyId]) {
-      prev[curr.dataKeyId] = {};
-    }
-    // NOTE: For now, we only care about where days is true
-    if (curr.value) {
-      prev[curr.dataKeyId][curr.dateKey] = { value: curr.value };
-    }
-    return prev;
-  }, {} as UserYearData);
+  return dayData;
 };
 
 /**
@@ -133,14 +140,19 @@ export const addDayData = async (
   dayDate: DayDate,
   value: boolean
 ) => {
-  const userCollection = collection(db, userId);
   const dateKey = getDateKey(dayDate);
-  const docRef = doc(userCollection, `${dataKeyId}_${dateKey}`);
+  const docRef = doc(
+    getUserDayDataCollection(userId, dayDate.year),
+    `${dataKeyId}_${dateKey}`
+  );
   const dayData: DayData = {
     ...dayDate,
     dataKeyId,
     value,
     dateKey,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    deletedAt: null,
   };
   await setDoc(docRef, dayData);
 };

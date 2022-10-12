@@ -1,6 +1,5 @@
 import { OAuthCredential, User } from "firebase/auth";
-import produce from "immer";
-import { uniq } from "lodash";
+import produce, { enableMapSet } from "immer";
 import moment from "moment";
 import create from "zustand";
 import {
@@ -9,11 +8,17 @@ import {
   signInWithGoogle,
   signOutAsync,
 } from "./auth";
-import { addDataKey, addDayData, fetchUserData } from "./database";
-import { DataKey, DayDate, SignInResult, YearDataMap } from "./types";
+import {
+  addDataKey,
+  addDayData,
+  deleteDataKey,
+  fetchUserData,
+} from "./database";
+import { DataKey, DayDate, SignInResult, YearData, YearDataMap } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
+enableMapSet();
 interface StoreState {
   loading: boolean;
   init: () => void;
@@ -99,21 +104,20 @@ const useStore = create<StoreState>()((set, get) => ({
     }
 
     let dataKeys: DataKey[] = [];
-    let yearData: { [dataKeyId in string]: string[] } = {};
+    let yearData: YearData = { true: {}, false: {} };
 
     if (user?.uid) {
       // If the user exists, fetch user data
       const userData = await fetchUserData(user.uid, get().year);
       dataKeys = userData.dataKeys;
 
-      if (userData.userYearData) {
-        yearData = Object.keys(userData.userYearData).reduce((prev, curr) => {
-          const dates = userData.userYearData![curr] || {};
-          // NOTE: For now, we only care about where days is true
-          prev[curr] = uniq(Object.keys(dates));
-          return prev;
-        }, {} as { [dataKeyId in string]: string[] });
-      }
+      yearData = userData.dayData.reduce((prev, curr) => {
+        if (!prev[`${curr.value}`][curr.dataKeyId]) {
+          prev[`${curr.value}`][curr.dataKeyId] = new Set([]);
+        }
+        prev[`${curr.value}`][curr.dataKeyId].add(curr.dateKey);
+        return prev;
+      }, yearData);
     }
 
     // Update the state
@@ -128,7 +132,6 @@ const useStore = create<StoreState>()((set, get) => ({
           accessToken,
           dataKeys,
           yearDataMap: {
-            ...state.yearDataMap,
             [get().year]: yearData,
           },
         } as StoreState)
@@ -137,15 +140,16 @@ const useStore = create<StoreState>()((set, get) => ({
 
   dataKeys: [],
   addDataKey: async (dataKeyLabel: string) => {
-    const dataKeyId = await addDataKey(get().user!.uid, dataKeyLabel);
+    const dataKey = await addDataKey(get().user!.uid, dataKeyLabel);
 
     set((state) => ({
-      dataKeys: [...state.dataKeys, { id: dataKeyId, label: dataKeyLabel }],
+      dataKeys: [...state.dataKeys, dataKey],
       showAddDataKeyDialog: false,
     }));
   },
-  deleteDataKey: (dataKeyId: string) => {
-    // TODO - implement deleting from firebase
+  deleteDataKey: async (dataKeyId: string) => {
+    await deleteDataKey(get().user!.uid, dataKeyId);
+    // TODO - update state.dataKeys
   },
 
   yearDataMap: {},
@@ -154,19 +158,22 @@ const useStore = create<StoreState>()((set, get) => ({
     set((state) => ({
       yearDataMap: produce(get().yearDataMap, (draft) => {
         if (!draft[get().year]) {
-          draft[get().year] = {};
+          draft[get().year] = { true: {}, false: {} };
         }
 
-        if (!draft[get().year][dataKeyId]) {
-          draft[get().year][dataKeyId] = [];
-        }
+        const dateKey = getDateKey(dayDate);
 
-        if (value) {
-          draft[get().year][dataKeyId].push(getDateKey(dayDate));
-        } else {
-          draft[get().year][dataKeyId] = draft[get().year][dataKeyId].filter(
-            (dateKey) => dateKey !== getDateKey(dayDate)
-          );
+        // Add the dateKey to the new value's map
+        const newValueKey = `${value}`;
+        if (!draft[get().year][newValueKey][dataKeyId]) {
+          draft[get().year][newValueKey][dataKeyId] = new Set([]);
+        }
+        draft[get().year][newValueKey][dataKeyId].add(dateKey);
+
+        // Remove the dateKey from the old value's map (if it exists)
+        const oldValueKey = `${!value}`;
+        if (draft[get().year][oldValueKey][dataKeyId]) {
+          draft[get().year][oldValueKey][dataKeyId].delete(dateKey);
         }
       }),
       showDayDataDialog: false,

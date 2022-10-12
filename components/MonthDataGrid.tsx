@@ -18,14 +18,16 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
     [year, month]
   );
 
-  const { data, openDayDataDialog } = useStore((state) => ({
-    data: new Set([...(state.yearDataMap[year]?.[dataKeyId] || [])]),
+  const { trueDates, falseDates, openDayDataDialog } = useStore((state) => ({
+    trueDates: state.yearDataMap[year][`${true}`][dataKeyId] || new Set([]),
+    falseDates: state.yearDataMap[year][`${false}`][dataKeyId] || new Set([]),
     openDayDataDialog: state.openDayDataDialog,
   }));
 
   const renderDay = (weekNum: number, dayInWeekNum: number, day: number) => {
     const dateKey = getDateKey({ year, month, day });
-    const hasData = data.has(dateKey);
+    const isTrue = trueDates.has(dateKey);
+    const isFalse = falseDates.has(dateKey);
     const dayMoment = moment(new Date(year, month, day));
     const isToday = dayMoment.isSame(moment(), "day");
 
@@ -35,13 +37,13 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
       ) : (
         <Typography
           variant="body2"
-          color={
-            hasData ? "green" : isToday ? colors.TEXT : colors.LIGHTER_TEXT
-          }
+          color={isToday ? colors.TEXT : colors.LIGHTER_TEXT}
         >
           {day}
         </Typography>
       );
+
+    const color = isTrue ? "green" : isFalse ? "red" : undefined;
 
     return (
       <Button
@@ -58,9 +60,10 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
           justifyContent: "center",
           alignItems: "center",
           borderRadius: "50%",
+          backgroundColor: color,
         }}
         onClick={() =>
-          openDayDataDialog(dataKeyId, { year, month, day }, hasData)
+          openDayDataDialog(dataKeyId, { year, month, day }, isTrue)
         }
       >
         {dayContent}
