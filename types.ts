@@ -56,9 +56,5 @@ export type YearDataMap = {
 
 export interface UserData {
   dataKeys: DataKey[];
-  dayData: DayData[];
+  yearData: YearData;
 }
-
-export type UserYearData = {
-  [dataKeyId in string]: { [dateKey in string]: { value: boolean } };
-};

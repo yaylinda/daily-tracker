@@ -26,8 +26,7 @@ import { getMonthLabels } from "../utils/dateUtil";
 const drawerWidth = 200;
 
 const SidebarLayout = () => {
-  const { loading, month, year, dataKeys, openAddDataKeyDialog, setMonth } =
-    useStore();
+  const { loading, month, year, dataKeys, isAuthed, setMonth } = useStore();
   const theme = useTheme();
   return (
     <>

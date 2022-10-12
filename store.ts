@@ -15,7 +15,7 @@ import {
   fetchUserData,
 } from "./database";
 import { DataKey, DayDate, SignInResult, YearData, YearDataMap } from "./types";
-import { LOCAL_STORAGE_KEYS } from "./utils/constants";
+import { DEFAULT_YEAR_DATA, LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
 enableMapSet();
@@ -31,6 +31,7 @@ interface StoreState {
   addDayData: (dataKeyId: string, dayDate: DayDate, value: boolean) => void;
   deleteDayData: (dayDataId: string) => void;
 
+  // TODO - can delete
   leftScroll: number;
   setLeftScroll: (leftScroll: number) => void;
 
@@ -71,6 +72,8 @@ interface StoreState {
 
 const useStore = create<StoreState>()((set, get) => ({
   loading: true,
+  dataKeys: [],
+  yearDataMap: {},
   init: async () => {
     // Try to get the user back from local storage
     const userStr = window.localStorage.getItem(LOCAL_STORAGE_KEYS.USER_KEY);
@@ -104,20 +107,13 @@ const useStore = create<StoreState>()((set, get) => ({
     }
 
     let dataKeys: DataKey[] = [];
-    let yearData: YearData = { true: {}, false: {} };
+    let yearData: YearData = { ...DEFAULT_YEAR_DATA };
 
     if (user?.uid) {
       // If the user exists, fetch user data
       const userData = await fetchUserData(user.uid, get().year);
       dataKeys = userData.dataKeys;
-
-      yearData = userData.dayData.reduce((prev, curr) => {
-        if (!prev[`${curr.value}`][curr.dataKeyId]) {
-          prev[`${curr.value}`][curr.dataKeyId] = new Set([]);
-        }
-        prev[`${curr.value}`][curr.dataKeyId].add(curr.dateKey);
-        return prev;
-      }, yearData);
+      yearData = userData.yearData;
     }
 
     // Update the state
@@ -138,7 +134,6 @@ const useStore = create<StoreState>()((set, get) => ({
     );
   },
 
-  dataKeys: [],
   addDataKey: async (dataKeyLabel: string) => {
     const dataKey = await addDataKey(get().user!.uid, dataKeyLabel);
 
@@ -152,7 +147,6 @@ const useStore = create<StoreState>()((set, get) => ({
     // TODO - update state.dataKeys
   },
 
-  yearDataMap: {},
   addDayData: async (dataKeyId: string, dayDate: DayDate, value: boolean) => {
     await addDayData(get().user!.uid, dataKeyId, dayDate, value);
     set((state) => ({
@@ -222,6 +216,7 @@ const useStore = create<StoreState>()((set, get) => ({
         );
       }
 
+      // Update the state with user info
       set(
         (state) =>
           ({
@@ -231,11 +226,26 @@ const useStore = create<StoreState>()((set, get) => ({
             isAuthed: true,
             isAnon: anon,
             showLoginDialog: false,
+            loading: true,
           } as StoreState)
       );
+
+      // Then try to fetch user data
+      const { dataKeys, yearData } = await fetchUserData(
+        result.userCredential.user.uid,
+        get().year
+      );
+
+      set((state) => ({
+        loading: false,
+        dataKeys,
+        yearDataMap: {
+          [get().year]: yearData,
+        },
+      }));
     } catch (e) {
-      console.log(`SIGN IN ERROR: ${JSON.stringify(e)}`);
-      // TODO - implement showing error message
+      // TODO - handle error
+      throw e;
     }
   },
   signOut: () => {
@@ -248,6 +258,17 @@ const useStore = create<StoreState>()((set, get) => ({
     set(
       (state) =>
         ({
+          loading: false,
+          dataKeys: [] as DataKey[],
+          yearDataMap: {},
+          year: moment().year(),
+          month: moment().month(),
+          showLoginDialog: false,
+          showAddDataKeyDialog: false,
+          showDayDataDialog: false,
+          dayDataDialogDataKeyId: null,
+          dayDataDialogDayDate: null,
+          dayDataDialogValue: false,
           idToken: null,
           accessToken: null,
           user: null,

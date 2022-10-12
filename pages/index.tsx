@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import type { NextPage } from "next";
 import React from "react";
+import LoggedOutView from "../components/LoggedOutView";
 import UserAvatar from "../components/UserAvatar";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
 import DayDataDialog from "../dialogs/DayDataDialog";
@@ -53,7 +54,7 @@ const Home: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      <SidebarLayout />
+      {!isAuthed && !loading ? <LoggedOutView /> : <SidebarLayout />}
       <LogInDialog />
       <AddDataKeyDialog />
       <DayDataDialog />

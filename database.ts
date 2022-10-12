@@ -9,10 +9,10 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import app from "./firebase";
-import { DataKey, DayData, DayDate, UserData, UserYearData } from "./types";
+import { DataKey, DayData, DayDate, UserData, YearData } from "./types";
+import { DEFAULT_YEAR_DATA } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
 // The firestore db object
@@ -32,8 +32,8 @@ export const fetchUserData = async (
   year: number
 ): Promise<UserData> => {
   const dataKeys = await getDataKeys(userId);
-  const dayData = await getDayData(userId, year);
-  return { dataKeys, dayData };
+  const yearData = await getYearData(userId, year);
+  return { dataKeys, yearData };
 };
 
 /**************************************
@@ -111,10 +111,10 @@ function getUserDayDataCollection(userId: string, year: number) {
  * @param userId
  * @returns
  */
-export const getDayData = async (
+export const getYearData = async (
   userId: string,
   year: number
-): Promise<DayData[]> => {
+): Promise<YearData> => {
   const dayDataQuerySnapshot = await getDocs(
     getUserDayDataCollection(userId, year)
   );
@@ -124,7 +124,16 @@ export const getDayData = async (
     dayData.push(doc.data() as DayData);
   });
 
-  return dayData;
+  return dayData.reduce(
+    (prev, curr) => {
+      if (!prev[`${curr.value}`][curr.dataKeyId]) {
+        prev[`${curr.value}`][curr.dataKeyId] = new Set([]);
+      }
+      prev[`${curr.value}`][curr.dataKeyId].add(curr.dateKey);
+      return prev;
+    },
+    { ...DEFAULT_YEAR_DATA } as YearData
+  );
 };
 
 /**
