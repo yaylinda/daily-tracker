@@ -12,7 +12,8 @@ import UserAvatar from "../components/UserAvatar";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
 import DayDataDialog from "../dialogs/DayDataDialog";
 import LogInDialog from "../dialogs/LogInDialog";
-import Layout from "../layout/Layout";
+import MainPanel from "../layout/MainPanel";
+import Sidebar from "../layout/Sidebar";
 import useStore from "../store";
 import theme, { colors } from "../theme";
 
@@ -51,10 +52,22 @@ const Home: NextPage = () => {
     );
   };
 
+  const renderContent = () => {
+    if (!isAuthed && !loading) {
+      return <LoggedOutView />;
+    }
+    return (
+      <>
+        <Sidebar />
+        <MainPanel />
+      </>
+    );
+  };
+
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      {!isAuthed && !loading ? <LoggedOutView /> : <Layout />}
+      {renderContent()}
       <LogInDialog />
       <AddDataKeyDialog />
     </ThemeProvider>

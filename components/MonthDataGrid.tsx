@@ -38,11 +38,10 @@ const MonthDataGrid = ({ dataKey, year, month }: MonthDataGridProps) => {
   };
 
   const closeDayDataDialog = () => {
-    setDayDataDialogProps({
+    setDayDataDialogProps((prev) => ({
+      ...prev,
       open: false,
-      dayDate: {} as DayDate,
-      dataKeys: [],
-    });
+    }));
   };
 
   const renderDay = (weekNum: number, dayInWeekNum: number, day: number) => {

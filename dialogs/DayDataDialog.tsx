@@ -140,6 +140,10 @@ const DayDataDialog = ({
       setSubmittingDataKeys((current) =>
         current.filter((id) => id !== dataKeyId)
       );
+      if (Object.keys(dataKeyValues).length === 1) {
+        // Auto-close the dialog if only updating 1 data key
+        onClose();
+      }
     });
   };
 
