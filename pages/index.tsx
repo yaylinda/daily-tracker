@@ -12,7 +12,7 @@ import UserAvatar from "../components/UserAvatar";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
 import DayDataDialog from "../dialogs/DayDataDialog";
 import LogInDialog from "../dialogs/LogInDialog";
-import SidebarLayout from "../layouts/SidebarLayout";
+import Layout from "../layout/Layout";
 import useStore from "../store";
 import theme, { colors } from "../theme";
 
@@ -54,7 +54,7 @@ const Home: NextPage = () => {
   return (
     <ThemeProvider theme={theme}>
       {renderHeader()}
-      {!isAuthed && !loading ? <LoggedOutView /> : <SidebarLayout />}
+      {!isAuthed && !loading ? <LoggedOutView /> : <Layout />}
       <LogInDialog />
       <AddDataKeyDialog />
     </ThemeProvider>
