@@ -1,4 +1,5 @@
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import StarIcon from "@mui/icons-material/Star";
 import {
   Box,
   Divider,
@@ -55,7 +56,11 @@ const SidebarLayout = () => {
                   onClick={() => setMonth(index)}
                 >
                   <ListItemIcon>
-                    <CalendarMonthIcon sx={{ color: colors.TEXT }} />
+                    {moment().month() === index && moment().year() === year ? (
+                      <StarIcon sx={{ color: "yellow" }} />
+                    ) : (
+                      <CalendarMonthIcon sx={{ color: colors.TEXT }} />
+                    )}
                   </ListItemIcon>
                   <ListItemText primary={text} />
                 </ListItemButton>

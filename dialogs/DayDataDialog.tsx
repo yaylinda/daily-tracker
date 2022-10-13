@@ -20,6 +20,8 @@ import { stringToColor } from "../utils/colorUtil";
 import { getDayData } from "../utils/yearDataUtils";
 import DialogTransition from "./dialogComponents/DialogTransition";
 
+const selectionRowHeight = 40;
+
 interface DayDataKeyValueSelectionProps {
   dataKey: DataKey;
   value: boolean | null;
@@ -39,7 +41,7 @@ const DayDataKeyValueSelection = ({
         display: "flex",
         flexDirection: "row",
         justifyContent: "space-between",
-        height: 40,
+        height: selectionRowHeight,
         overflowY: "hidden",
         gap: 2,
       }}
@@ -47,9 +49,11 @@ const DayDataKeyValueSelection = ({
       <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
         <Box
           sx={{
-            height: 40,
+            height: selectionRowHeight,
             width: 20,
             backgroundColor: stringToColor(dataKey.id),
+            borderTopLeftRadius: 5,
+            borderBottomLeftRadius: 5,
           }}
         />
         <Typography
@@ -57,8 +61,10 @@ const DayDataKeyValueSelection = ({
           sx={{
             alignSelf: "center",
             width: 250,
-            height: 40,
+            height: selectionRowHeight,
             textOverflow: "ellipsis",
+            verticalAlign: "middle",
+            lineHeight: `${selectionRowHeight}px`,
           }}
         >
           {dataKey.label}
@@ -67,7 +73,12 @@ const DayDataKeyValueSelection = ({
       <ToggleButtonGroup
         value={value}
         exclusive
-        onChange={(event, value) => onChange(value)}
+        onChange={(event, newValue) => {
+          if (newValue === null || value === newValue) {
+            return;
+          }
+          onChange(newValue);
+        }}
       >
         <ToggleButton value={false} disabled={loading}>
           {loading ? (
@@ -123,10 +134,6 @@ const DayDataDialog = ({
     []
   );
 
-  if (!open) {
-    return null;
-  }
-
   const onDataKeyValueUpdate = (dataKeyId: string, value: boolean) => {
     setSubmittingDataKeys((current) => [...current, dataKeyId]);
     addDayData(dataKeyId, dayDate, value).then(() => {
@@ -142,11 +149,13 @@ const DayDataDialog = ({
       open={open}
       TransitionComponent={DialogTransition}
     >
-      <DialogTitle>
-        {moment(new Date(dayDate.year, dayDate.month, dayDate.day)).format(
-          "LL"
-        )}
-      </DialogTitle>
+      {open && (
+        <DialogTitle>
+          {moment(new Date(dayDate.year, dayDate.month, dayDate.day)).format(
+            "LL"
+          )}
+        </DialogTitle>
+      )}
       <DialogContent>
         <Stack sx={{ gap: 2 }}>
           {Object.values(dataKeyValues).map(({ dataKey, value }) => (
