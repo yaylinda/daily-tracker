@@ -15,7 +15,7 @@ import {
   fetchUserData,
 } from "./database";
 import { DataKey, DayDate, SignInResult, YearData, YearDataMap } from "./types";
-import { DEFAULT_YEAR_DATA, LOCAL_STORAGE_KEYS } from "./utils/constants";
+import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
 enableMapSet();
@@ -100,7 +100,7 @@ const useStore = create<StoreState>()((set, get) => ({
     }
 
     let dataKeys: DataKey[] = [];
-    let yearData: YearData = { ...DEFAULT_YEAR_DATA };
+    let yearData: YearData = { true: {}, false: {} };
 
     if (user?.uid) {
       // If the user exists, fetch user data

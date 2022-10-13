@@ -12,7 +12,6 @@ import {
 } from "firebase/firestore";
 import app from "./firebase";
 import { DataKey, DayData, DayDate, UserData, YearData } from "./types";
-import { DEFAULT_YEAR_DATA } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
 // The firestore db object
@@ -135,7 +134,7 @@ export const getYearData = async (
       prev[`${curr.value}`][curr.dataKeyId].add(curr.dateKey);
       return prev;
     },
-    { ...DEFAULT_YEAR_DATA } as YearData
+    { true: {}, false: {} } as YearData
   );
 };
 

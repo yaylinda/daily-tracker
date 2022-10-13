@@ -8,4 +8,3 @@ export const LOCAL_STORAGE_KEYS = Object.freeze({
   ID_TOKEN_KEY: "_id_token",
   ACCESS_TOKEN_KEY: "_access_token",
 });
-export const DEFAULT_YEAR_DATA = { true: {}, false: {} };
