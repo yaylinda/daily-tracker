@@ -58,7 +58,7 @@ const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
         <DayOfWeekLabelRow
           containerStyles={{ backgroundColor: color, borderTopRightRadius: 5 }}
         />
-        <MonthDataGrid dataKeyId={dataKey.id} year={year} month={month} />
+        <MonthDataGrid dataKey={dataKey} year={year} month={month} />
       </Box>
     </Stack>
   );

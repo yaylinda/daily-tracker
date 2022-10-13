@@ -57,7 +57,6 @@ const Home: NextPage = () => {
       {!isAuthed && !loading ? <LoggedOutView /> : <SidebarLayout />}
       <LogInDialog />
       <AddDataKeyDialog />
-      <DayDataDialog />
     </ThemeProvider>
   );
 };

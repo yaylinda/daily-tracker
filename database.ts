@@ -126,6 +126,9 @@ export const getYearData = async (
 
   return dayData.reduce(
     (prev, curr) => {
+      if (curr.value == null) {
+        return prev;
+      }
       if (!prev[`${curr.value}`][curr.dataKeyId]) {
         prev[`${curr.value}`][curr.dataKeyId] = new Set([]);
       }

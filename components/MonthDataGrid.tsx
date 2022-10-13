@@ -1,33 +1,53 @@
 import { Box, Button, Typography } from "@mui/material";
 import moment from "moment";
 import React from "react";
+import DayDataDialog from "../dialogs/DayDataDialog";
 import useStore from "../store";
 import { colors } from "../theme";
+import { DataKey, DayDate } from "../types";
 import { DAY_WIDTH } from "../utils/constants";
-import { getDateKey, getDaysInMonth } from "../utils/dateUtil";
+import { getDaysInMonth } from "../utils/dateUtil";
+import { getDayData } from "../utils/yearDataUtils";
 
 export interface MonthDataGridProps {
-  dataKeyId: string;
+  dataKey: DataKey;
   year: number;
   month: number;
 }
 
-const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
+const MonthDataGrid = ({ dataKey, year, month }: MonthDataGridProps) => {
   const daysInMonth = React.useMemo(
     () => getDaysInMonth(year, month),
     [year, month]
   );
 
-  const { trueDates, falseDates, openDayDataDialog } = useStore((state) => ({
-    trueDates: state.yearDataMap[year][`${true}`][dataKeyId] || new Set([]),
-    falseDates: state.yearDataMap[year][`${false}`][dataKeyId] || new Set([]),
-    openDayDataDialog: state.openDayDataDialog,
-  }));
+  const yearData = useStore((state) => state.yearDataMap[year]);
+
+  const [dayDataDialogProps, setDayDataDialogProps] = React.useState<{
+    open: boolean;
+    dayDate: DayDate;
+    dataKeys: DataKey[];
+  }>({ open: false, dayDate: {} as DayDate, dataKeys: [] });
+
+  const openDayDataDialog = (dataKey: DataKey, day: number) => {
+    setDayDataDialogProps({
+      open: true,
+      dayDate: { year, month, day },
+      dataKeys: [dataKey],
+    });
+  };
+
+  const closeDayDataDialog = () => {
+    setDayDataDialogProps({
+      open: false,
+      dayDate: {} as DayDate,
+      dataKeys: [],
+    });
+  };
 
   const renderDay = (weekNum: number, dayInWeekNum: number, day: number) => {
-    const dateKey = getDateKey({ year, month, day });
-    const isTrue = trueDates.has(dateKey);
-    const isFalse = falseDates.has(dateKey);
+    const dayDate = { year, month, day };
+    const { isTrue, isFalse } = getDayData(yearData, dataKey.id, dayDate);
     const dayMoment = moment(new Date(year, month, day));
     const isToday = dayMoment.isSame(moment(), "day");
     const isFuture = dayMoment.isAfter(moment(), "day");
@@ -74,9 +94,7 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
           borderRadius: 0,
           backgroundColor: backgroundColor,
         }}
-        onClick={() =>
-          openDayDataDialog(dataKeyId, { year, month, day }, isTrue)
-        }
+        onClick={() => openDayDataDialog(dataKey, day)}
       >
         {dayContent}
       </Button>
@@ -84,18 +102,21 @@ const MonthDataGrid = ({ dataKeyId, year, month }: MonthDataGridProps) => {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column" }}>
-      {daysInMonth.map((weekInMonth, weekNum) => (
-        <Box
-          key={`month_${month}_week_${weekNum}`}
-          sx={{ display: "flex", flexDirection: "row" }}
-        >
-          {weekInMonth.map((dayInWeek, dayNum) =>
-            renderDay(weekNum, dayNum, dayInWeek.day)
-          )}
-        </Box>
-      ))}
-    </Box>
+    <>
+      <Box sx={{ display: "flex", flexDirection: "column" }}>
+        {daysInMonth.map((weekInMonth, weekNum) => (
+          <Box
+            key={`month_${month}_week_${weekNum}`}
+            sx={{ display: "flex", flexDirection: "row" }}
+          >
+            {weekInMonth.map((dayInWeek, dayNum) =>
+              renderDay(weekNum, dayNum, dayInWeek.day)
+            )}
+          </Box>
+        ))}
+      </Box>
+      <DayDataDialog onClose={closeDayDataDialog} {...dayDataDialogProps} />
+    </>
   );
 };
 

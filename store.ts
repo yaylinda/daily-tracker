@@ -28,7 +28,11 @@ interface StoreState {
   deleteDataKey: (dataKeyId: string) => void;
 
   yearDataMap: YearDataMap;
-  addDayData: (dataKeyId: string, dayDate: DayDate, value: boolean) => void;
+  addDayData: (
+    dataKeyId: string,
+    dayDate: DayDate,
+    value: boolean
+  ) => Promise<void>;
   deleteDayData: (dayDataId: string) => void;
 
   // TODO - can delete
@@ -57,17 +61,6 @@ interface StoreState {
   showAddDataKeyDialog: boolean;
   openAddDataKeyDialog: () => void;
   closeAddDataKeyDialog: () => void;
-
-  showDayDataDialog: boolean;
-  dayDataDialogDataKeyId: string | null;
-  dayDataDialogDayDate: DayDate | null;
-  dayDataDialogValue: boolean;
-  openDayDataDialog: (
-    dataKeyId: string,
-    dayDate: DayDate,
-    value: boolean
-  ) => void;
-  closeDayDataDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
@@ -150,30 +143,25 @@ const useStore = create<StoreState>()((set, get) => ({
   addDayData: async (dataKeyId: string, dayDate: DayDate, value: boolean) => {
     await addDayData(get().user!.uid, dataKeyId, dayDate, value);
     set((state) => ({
-      yearDataMap: produce(get().yearDataMap, (draft) => {
-        if (!draft[get().year]) {
-          draft[get().year] = { true: {}, false: {} };
-        }
+      yearDataMap: {
+        ...state.yearDataMap,
+        [dayDate.year]: produce(state.yearDataMap[dayDate.year], (draft) => {
+          const dateKey = getDateKey(dayDate);
 
-        const dateKey = getDateKey(dayDate);
+          // Add the dateKey to the new value's map
+          const newValueKey = `${value}`;
+          if (!draft[newValueKey][dataKeyId]) {
+            draft[newValueKey][dataKeyId] = new Set([]);
+          }
+          draft[newValueKey][dataKeyId].add(dateKey);
 
-        // Add the dateKey to the new value's map
-        const newValueKey = `${value}`;
-        if (!draft[get().year][newValueKey][dataKeyId]) {
-          draft[get().year][newValueKey][dataKeyId] = new Set([]);
-        }
-        draft[get().year][newValueKey][dataKeyId].add(dateKey);
-
-        // Remove the dateKey from the old value's map (if it exists)
-        const oldValueKey = `${!value}`;
-        if (draft[get().year][oldValueKey][dataKeyId]) {
-          draft[get().year][oldValueKey][dataKeyId].delete(dateKey);
-        }
-      }),
-      showDayDataDialog: false,
-      dayDataDialogDataKeyId: null,
-      dayDataDialogDayDate: null,
-      dayDataDialogValue: false,
+          // Remove the dateKey from the old value's map (if it exists)
+          const oldValueKey = `${!value}`;
+          if (draft[oldValueKey][dataKeyId]) {
+            draft[oldValueKey][dataKeyId].delete(dateKey);
+          }
+        }),
+      },
     }));
   },
   deleteDayData: (dayDataId: string) => {
@@ -265,10 +253,6 @@ const useStore = create<StoreState>()((set, get) => ({
           month: moment().month(),
           showLoginDialog: false,
           showAddDataKeyDialog: false,
-          showDayDataDialog: false,
-          dayDataDialogDataKeyId: null,
-          dayDataDialogDayDate: null,
-          dayDataDialogValue: false,
           idToken: null,
           accessToken: null,
           user: null,
@@ -338,32 +322,32 @@ const useStore = create<StoreState>()((set, get) => ({
   closeAddDataKeyDialog: () =>
     set((state) => ({ showAddDataKeyDialog: false } as StoreState)),
 
-  showDayDataDialog: false,
-  dayDataDialogDataKeyId: null,
-  dayDataDialogDayDate: null,
-  dayDataDialogValue: false,
-  openDayDataDialog: (dataKeyId: string, dayDate: DayDate, value: boolean) => {
-    set(
-      (state) =>
-        ({
-          showDayDataDialog: true,
-          dayDataDialogDataKeyId: dataKeyId,
-          dayDataDialogDayDate: dayDate,
-          dayDataDialogValue: value,
-        } as StoreState)
-    );
-  },
-  closeDayDataDialog: () => {
-    set(
-      (state) =>
-        ({
-          showDayDataDialog: false,
-          dayDataDialogDataKeyId: null,
-          dayDataDialogDayDate: null,
-          dayDataDialogValue: false,
-        } as StoreState)
-    );
-  },
+  // showDayDataDialog: false,
+  // dayDataDialogDataKey: null,
+  // dayDataDialogDayDate: null,
+  // dayDataDialogValue: false,
+  // openDayDataDialog: (dataKey: DataKey, dayDate: DayDate, value: boolean) => {
+  //   set(
+  //     (state) =>
+  //       ({
+  //         showDayDataDialog: true,
+  //         dayDataDialogDataKey: dataKey,
+  //         dayDataDialogDayDate: dayDate,
+  //         dayDataDialogValue: value,
+  //       } as StoreState)
+  //   );
+  // },
+  // closeDayDataDialog: () => {
+  //   set(
+  //     (state) =>
+  //       ({
+  //         showDayDataDialog: false,
+  //         dayDataDialogDataKey: null,
+  //         dayDataDialogDayDate: null,
+  //         dayDataDialogValue: false,
+  //       } as StoreState)
+  //   );
+  // },
 }));
 
 export default useStore;
