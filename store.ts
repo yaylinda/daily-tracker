@@ -321,33 +321,6 @@ const useStore = create<StoreState>()((set, get) => ({
     set((state) => ({ showAddDataKeyDialog: true } as StoreState)),
   closeAddDataKeyDialog: () =>
     set((state) => ({ showAddDataKeyDialog: false } as StoreState)),
-
-  // showDayDataDialog: false,
-  // dayDataDialogDataKey: null,
-  // dayDataDialogDayDate: null,
-  // dayDataDialogValue: false,
-  // openDayDataDialog: (dataKey: DataKey, dayDate: DayDate, value: boolean) => {
-  //   set(
-  //     (state) =>
-  //       ({
-  //         showDayDataDialog: true,
-  //         dayDataDialogDataKey: dataKey,
-  //         dayDataDialogDayDate: dayDate,
-  //         dayDataDialogValue: value,
-  //       } as StoreState)
-  //   );
-  // },
-  // closeDayDataDialog: () => {
-  //   set(
-  //     (state) =>
-  //       ({
-  //         showDayDataDialog: false,
-  //         dayDataDialogDataKey: null,
-  //         dayDataDialogDayDate: null,
-  //         dayDataDialogValue: false,
-  //       } as StoreState)
-  //   );
-  // },
 }));
 
 export default useStore;
