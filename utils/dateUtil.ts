@@ -86,3 +86,15 @@ export const getDateKey = ({ year, month, day }: DayDate): string => {
   const dayStr = day <= 9 ? `0${day}` : day;
   return `${year}_${monthStr}_${dayStr}`;
 };
+
+export const getMomentFromDayDate = ({
+  year,
+  month,
+  day,
+}: DayDate): moment.Moment => {
+  return moment(new Date(year, month, day));
+};
+
+export const getDayDateFromMoment = (input: moment.Moment): DayDate => {
+  return { year: input.year(), month: input.month(), day: input.date() };
+};

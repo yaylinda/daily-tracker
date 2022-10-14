@@ -1,10 +1,12 @@
 import { Box, Stack, Typography } from "@mui/material";
+import React from "react";
 import useStore from "../store";
 import { DataKey } from "../types";
 import { stringToColor } from "../utils/colorUtil";
 import { DAY_WIDTH, MONTH_WIDTH } from "../utils/constants";
+import { getDaysInMonth } from "../utils/dateUtil";
+import CalendarDay from "./CalendarDay";
 import DayOfWeekLabelRow from "./DayOfWeekLabelRow";
-import MonthDataGrid from "./MonthDataGrid";
 
 interface LabelledMonthDataGridProps {
   dataKey: DataKey;
@@ -12,6 +14,11 @@ interface LabelledMonthDataGridProps {
 
 const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
   const { month, year } = useStore();
+
+  const daysInMonth = React.useMemo(
+    () => getDaysInMonth(year, month),
+    [year, month]
+  );
   const color = stringToColor(dataKey.id);
 
   return (
@@ -58,7 +65,22 @@ const LabelledMonthDataGrid = ({ dataKey }: LabelledMonthDataGridProps) => {
         <DayOfWeekLabelRow
           containerStyles={{ backgroundColor: color, borderTopRightRadius: 5 }}
         />
-        <MonthDataGrid dataKey={dataKey} year={year} month={month} />
+        <Box sx={{ display: "flex", flexDirection: "column" }}>
+          {daysInMonth.map((weekInMonth, weekNum) => (
+            <Box
+              key={`${dataKey.id}_${month}_week_${weekNum}`}
+              sx={{ display: "flex", flexDirection: "row" }}
+            >
+              {weekInMonth.map((dayInWeek, dayNum) => (
+                <CalendarDay
+                  key={`${dataKey.id}_${month}_day_${dayNum}`}
+                  dayDate={{ ...dayInWeek }}
+                  dataKey={dataKey}
+                />
+              ))}
+            </Box>
+          ))}
+        </Box>
       </Box>
     </Stack>
   );

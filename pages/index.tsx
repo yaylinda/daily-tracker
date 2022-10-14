@@ -1,5 +1,6 @@
 import {
   AppBar,
+  Box,
   Button,
   ThemeProvider,
   Toolbar,
@@ -10,7 +11,6 @@ import React from "react";
 import LoggedOutView from "../components/LoggedOutView";
 import UserAvatar from "../components/UserAvatar";
 import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
-import DayDataDialog from "../dialogs/DayDataDialog";
 import LogInDialog from "../dialogs/LogInDialog";
 import MainPanel from "../layout/MainPanel";
 import Sidebar from "../layout/Sidebar";
@@ -22,11 +22,9 @@ const Home: NextPage = () => {
 
   React.useEffect(() => {
     init();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /**
-   * Header Component
-   */
   const renderHeader = () => {
     return (
       <AppBar
@@ -37,16 +35,22 @@ const Home: NextPage = () => {
         }}
       >
         <Toolbar>
-          <Typography variant="h4" sx={{ textAlign: "center", flexGrow: 1 }}>
+          <Typography
+            variant="h4"
+            noWrap
+            sx={{ textAlign: "center", flexGrow: 1 }}
+          >
             Life as Booleans
           </Typography>
-          {loading ? null : isAuthed ? (
-            <UserAvatar />
-          ) : (
-            <Button color="inherit" onClick={openLoginDialog}>
-              Login
-            </Button>
-          )}
+          <Box>
+            {loading ? null : isAuthed ? (
+              <UserAvatar />
+            ) : (
+              <Button color="inherit" onClick={openLoginDialog}>
+                Login
+              </Button>
+            )}
+          </Box>
         </Toolbar>
       </AppBar>
     );

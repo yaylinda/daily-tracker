@@ -61,6 +61,11 @@ interface StoreState {
   showAddDataKeyDialog: boolean;
   openAddDataKeyDialog: () => void;
   closeAddDataKeyDialog: () => void;
+
+  showDayDataDialog: boolean;
+  dayDataDialogProps: { dataKey: DataKey; dayDate: DayDate } | null;
+  openDayDataDialog: (dataKey: DataKey, dayDate: DayDate) => void;
+  closeDayDataDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
@@ -321,6 +326,18 @@ const useStore = create<StoreState>()((set, get) => ({
     set((state) => ({ showAddDataKeyDialog: true } as StoreState)),
   closeAddDataKeyDialog: () =>
     set((state) => ({ showAddDataKeyDialog: false } as StoreState)),
+
+  showDayDataDialog: false,
+  dayDataDialogProps: null,
+  openDayDataDialog: (dataKey: DataKey, dayDate: DayDate) => {
+    console.log("********** opening!!!!");
+    set(() => ({
+      showDayDataDialog: true,
+      dayDataDialogProps: { dataKey, dayDate },
+    }));
+  },
+  closeDayDataDialog: () =>
+    set(() => ({ showDayDataDialog: false, dayDataDialogProps: null })),
 }));
 
 export default useStore;
