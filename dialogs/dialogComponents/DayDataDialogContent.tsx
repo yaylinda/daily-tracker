@@ -1,6 +1,13 @@
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Collapse,
+  IconButton,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { includes } from "lodash";
 import moment from "moment";
 import React from "react";
@@ -107,15 +114,38 @@ const DayDataDialogContent = ({
         </Box>
       </Box>
       <Stack sx={{ gap: 2 }}>
-        {Object.values(dataKeyValues).map(({ dataKey, value }) => (
-          <DataKeyValueSelection
-            key={dataKey.id}
-            dataKey={dataKey}
-            value={value}
-            onChange={(value) => onDataKeyValueUpdate(dataKey.id, value)}
-            loading={includes(submittingDataKeys, dataKey.id)}
-          />
-        ))}
+        <DataKeyValueSelection
+          key={dataKey.id}
+          dataKey={dataKeyValues[dataKey.id].dataKey}
+          value={dataKeyValues[dataKey.id].value}
+          onChange={(value) => onDataKeyValueUpdate(dataKey.id, value)}
+          loading={includes(submittingDataKeys, dataKey.id)}
+        />
+        <Collapse in={expanded} timeout="auto">
+          <Stack sx={{ gap: 2 }}>
+            {Object.values(dataKeyValues)
+              .filter((dataKeyValue) => dataKeyValue.dataKey.id !== dataKey.id)
+              .map((dataKeyValue) => (
+                <DataKeyValueSelection
+                  key={dataKeyValue.dataKey.id}
+                  dataKey={dataKeyValue.dataKey}
+                  value={dataKeyValue.value}
+                  onChange={(value) =>
+                    onDataKeyValueUpdate(dataKeyValue.dataKey.id, value)
+                  }
+                  loading={includes(
+                    submittingDataKeys,
+                    dataKeyValue.dataKey.id
+                  )}
+                />
+              ))}
+          </Stack>
+        </Collapse>
+        {dataKeys.length > 1 && (
+          <Button onClick={() => setExpanded((curr) => !curr)}>
+            {expanded ? "Hide" : "Show all"}
+          </Button>
+        )}
       </Stack>
     </>
   );
