@@ -1,7 +1,6 @@
 import { ThemeProvider } from "@emotion/react";
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import React from "react";
-import "./App.css";
 import LoggedOutView from "./components/LoggedOutView";
 import UserAvatar from "./components/UserAvatar";
 import AddDataKeyDialog from "./dialogs/AddDataKeyDialog";
