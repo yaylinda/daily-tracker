@@ -71,7 +71,7 @@ const DayDataDialogContent = ({
         );
         if (Object.keys(dataKeyValues).length === 1) {
           // Auto-close the dialog if only updating 1 data key
-          closeDayDataDialog();
+          // setTimeout(() => closeDayDataDialog(), 250);
         }
       }
     );

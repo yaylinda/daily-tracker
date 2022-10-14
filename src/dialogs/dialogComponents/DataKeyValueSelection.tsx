@@ -7,6 +7,7 @@ import {
   ToggleButton,
   CircularProgress,
 } from "@mui/material";
+import React from "react";
 import { DataKey } from "../../types";
 import { stringToColor } from "../../utils/colorUtil";
 
@@ -25,6 +26,8 @@ const DataKeyValueSelection = ({
   loading,
   onChange,
 }: DataKeyValueSelectionProps) => {
+  const [newValue, setNewValue] = React.useState();
+
   return (
     <Box
       sx={{
@@ -65,6 +68,7 @@ const DataKeyValueSelection = ({
         exclusive
         onChange={(event, newValue) => {
           if (newValue === null || value === newValue) {
+            setNewValue(newValue);
             return;
           }
           onChange(newValue);

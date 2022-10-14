@@ -1,23 +1,17 @@
-import {
-  AppBar,
-  Box,
-  Button,
-  ThemeProvider,
-  Toolbar,
-  Typography,
-} from "@mui/material";
-import type { NextPage } from "next";
+import { ThemeProvider } from "@emotion/react";
+import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import React from "react";
-import LoggedOutView from "../components/LoggedOutView";
-import UserAvatar from "../components/UserAvatar";
-import AddDataKeyDialog from "../dialogs/AddDataKeyDialog";
-import LogInDialog from "../dialogs/LogInDialog";
-import MainPanel from "../layout/MainPanel";
-import Sidebar from "../layout/Sidebar";
-import useStore from "../store";
-import theme, { colors } from "../theme";
+import "./App.css";
+import LoggedOutView from "./components/LoggedOutView";
+import UserAvatar from "./components/UserAvatar";
+import AddDataKeyDialog from "./dialogs/AddDataKeyDialog";
+import LogInDialog from "./dialogs/LogInDialog";
+import MainPanel from "./layout/MainPanel";
+import Sidebar from "./layout/Sidebar";
+import useStore from "./store";
+import theme, { colors } from "./theme";
 
-const Home: NextPage = () => {
+function App() {
   const { isAuthed, loading, init, openLoginDialog } = useStore();
 
   React.useEffect(() => {
@@ -76,6 +70,6 @@ const Home: NextPage = () => {
       <AddDataKeyDialog />
     </ThemeProvider>
   );
-};
+}
 
-export default Home;
+export default App;
