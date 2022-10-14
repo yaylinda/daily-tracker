@@ -26,6 +26,7 @@ const Sidebar = () => {
     return (
       <ListItem key={monthLabel} disablePadding>
         <ListItemButton
+          disabled={moment().month() < monthIndex}
           selected={month === monthIndex}
           onClick={() => setMonth(monthIndex)}
         >

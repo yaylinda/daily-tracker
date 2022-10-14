@@ -83,6 +83,10 @@ const DayDataDialogContent = ({
         <Typography variant="h6">{currentMoment.format("LL")}</Typography>
         <Box>
           <IconButton
+            disabled={currentMoment
+              .clone()
+              .subtract(1, "day")
+              .isBefore(moment(), "month")}
             onClick={() => {
               setCurrentMoment((curr) => curr.clone().subtract(1, "day"));
             }}
@@ -90,6 +94,10 @@ const DayDataDialogContent = ({
             <KeyboardArrowLeftIcon />
           </IconButton>
           <IconButton
+            disabled={currentMoment
+              .clone()
+              .add(1, "day")
+              .isAfter(moment(), "day")}
             onClick={() =>
               setCurrentMoment((curr) => curr.clone().add(1, "day"))
             }

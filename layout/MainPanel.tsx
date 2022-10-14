@@ -7,12 +7,10 @@ import {
   useTheme,
 } from "@mui/material";
 import moment from "moment";
-import React from "react";
 import AddDataKeyGridItem from "../components/AddDataKeyGridItem";
 import LabelledMonthDataGrid from "../components/LabelledMonthDataGrid";
 import DayDataDialog from "../dialogs/DayDataDialog";
 import useStore from "../store";
-import { DayDate, DataKey } from "../types";
 import { DAY_WIDTH, SIDEBAR_WIDTH } from "../utils/constants";
 
 const MainPanel = () => {
@@ -39,9 +37,15 @@ const MainPanel = () => {
               marginBottom: 5,
             }}
           >
-            <Typography variant="h2">
-              {moment().month(month).format("MMMM")} {year}
-            </Typography>
+            <Box sx={{ display: "flex", flexDirection: "row" }}>
+              <Typography
+                variant="h2"
+                sx={{ marginRight: 4, fontWeight: "bold" }}
+              >
+                {moment().month(month).format("MMMM")}
+              </Typography>
+              <Typography variant="h2">{year}</Typography>
+            </Box>
           </Box>
 
           {loading ? (
