@@ -1,12 +1,5 @@
 import { ThemeProvider } from "@emotion/react";
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Box,
-  Button,
-  useTheme,
-} from "@mui/material";
+import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
 import UserAvatar from "./components/UserAvatar";
@@ -15,7 +8,7 @@ import LogInDialog from "./dialogs/LogInDialog";
 import MainPanel from "./layout/MainPanel";
 import Sidebar from "./layout/Sidebar";
 import useStore from "./store";
-import theme, { colors } from "./theme";
+import theme from "./theme";
 
 function App() {
   const { isAuthed, loading, init, openLoginDialog } = useStore();
@@ -42,15 +35,7 @@ function App() {
           >
             Life as Booleans
           </Typography>
-          <Box>
-            {loading ? null : isAuthed ? (
-              <UserAvatar />
-            ) : (
-              <Button color="inherit" onClick={openLoginDialog}>
-                Login
-              </Button>
-            )}
-          </Box>
+          <Box>{!loading && !isAuthed && <UserAvatar />}</Box>
         </Toolbar>
       </AppBar>
     );
