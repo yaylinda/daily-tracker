@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/static/css/main.77c255a8.css",
-    "main.js": "/static/js/main.40417e8d.js",
-    "static/js/496.9bfe6f75.chunk.js": "/static/js/496.9bfe6f75.chunk.js",
-    "index.html": "/index.html",
-    "main.77c255a8.css.map": "/static/css/main.77c255a8.css.map",
-    "main.40417e8d.js.map": "/static/js/main.40417e8d.js.map",
-    "496.9bfe6f75.chunk.js.map": "/static/js/496.9bfe6f75.chunk.js.map"
+    "main.css": "/life-as-booleans/static/css/main.77c255a8.css",
+    "main.js": "/life-as-booleans/static/js/main.60c68f15.js",
+    "static/js/496.9bfe6f75.chunk.js": "/life-as-booleans/static/js/496.9bfe6f75.chunk.js",
+    "index.html": "/life-as-booleans/index.html",
+    "main.77c255a8.css.map": "/life-as-booleans/static/css/main.77c255a8.css.map",
+    "main.60c68f15.js.map": "/life-as-booleans/static/js/main.60c68f15.js.map",
+    "496.9bfe6f75.chunk.js.map": "/life-as-booleans/static/js/496.9bfe6f75.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.77c255a8.css",
-    "static/js/main.40417e8d.js"
+    "static/js/main.60c68f15.js"
   ]
 }
