@@ -1,22 +1,14 @@
-import {
-  Box,
-  Grid,
-  LinearProgress,
-  Toolbar,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { Box, Grid, LinearProgress, Toolbar, Typography } from "@mui/material";
 import moment from "moment";
 import AddDataKeyGridItem from "../components/AddDataKeyGridItem";
 import LabelledMonthDataGrid from "../components/LabelledMonthDataGrid";
 import DayDataDialog from "../dialogs/DayDataDialog";
 import useStore from "../store";
+import theme from "../theme";
 import { DAY_WIDTH, SIDEBAR_WIDTH } from "../utils/constants";
 
 const MainPanel = () => {
   const { loading, month, year, dataKeys } = useStore();
-
-  const theme = useTheme();
 
   return (
     <>

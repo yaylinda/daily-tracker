@@ -1,5 +1,12 @@
 import { ThemeProvider } from "@emotion/react";
-import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  Button,
+  useTheme,
+} from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
 import UserAvatar from "./components/UserAvatar";
@@ -23,7 +30,7 @@ function App() {
       <AppBar
         position="fixed"
         sx={{
-          backgroundColor: colors.SURFACE_BACKGROUND,
+          backgroundColor: theme.palette.background.default,
           zIndex: (theme) => theme.zIndex.drawer + 1,
         }}
       >
