@@ -1,5 +1,6 @@
+import FlakyIcon from "@mui/icons-material/Flaky";
 import { ThemeProvider } from "@emotion/react";
-import { AppBar, Box, Toolbar, Typography } from "@mui/material";
+import { AppBar, Avatar, Box, Toolbar, Typography } from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
 import UserAvatar from "./components/UserAvatar";
@@ -28,6 +29,13 @@ function App() {
         }}
       >
         <Toolbar>
+          <Box>
+            {!loading && isAuthed && (
+              <Avatar>
+                <FlakyIcon />
+              </Avatar>
+            )}
+          </Box>
           <Typography
             variant="h4"
             noWrap
@@ -35,7 +43,7 @@ function App() {
           >
             Life as Booleans
           </Typography>
-          <Box>{!loading && !isAuthed && <UserAvatar />}</Box>
+          <Box>{!loading && isAuthed && <UserAvatar />}</Box>
         </Toolbar>
       </AppBar>
     );

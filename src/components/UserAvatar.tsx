@@ -29,8 +29,7 @@ function stringAvatar(name: string) {
 }
 
 const UserAvatar = () => {
-  const { idToken, accessToken, user, isAnon, signOut, openLoginDialog } =
-    useStore();
+  const { idToken, accessToken, user, isAnon, openLoginDialog } = useStore();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
