@@ -58,3 +58,9 @@ export interface UserData {
   dataKeys: DataKey[];
   yearData: YearData;
 }
+
+export enum NavigationTab {
+  TODAY = "Today",
+  VARIABLES = "Variables",
+  STATS = "Stats",
+}

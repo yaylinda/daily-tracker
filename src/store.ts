@@ -14,7 +14,7 @@ import {
   deleteDataKey,
   fetchUserData,
 } from "./database";
-import { DataKey, DayDate, SignInResult, YearData, YearDataMap } from "./types";
+import { DataKey, DayDate, NavigationTab, SignInResult, YearData, YearDataMap } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
@@ -22,6 +22,9 @@ enableMapSet();
 interface StoreState {
   loading: boolean;
   init: () => void;
+
+  navigationTab: NavigationTab;
+  setNavigationTab: (newTab: NavigationTab) => void;
 
   dataKeys: DataKey[];
   addDataKey: (dataKeyLabel: string) => void;
@@ -70,6 +73,14 @@ interface StoreState {
 
 const useStore = create<StoreState>()((set, get) => ({
   loading: true,
+
+  navigationTab: NavigationTab.TODAY,
+  setNavigationTab: (newTab: NavigationTab) => {
+    set((state) => ({
+      navigationTab: newTab,
+    }))
+  },
+
   dataKeys: [],
   yearDataMap: {},
   init: async () => {

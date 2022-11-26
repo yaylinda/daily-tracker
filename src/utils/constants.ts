@@ -9,3 +9,6 @@ export const LOCAL_STORAGE_KEYS = Object.freeze({
   ACCESS_TOKEN_KEY: "_access_token",
 });
 export const SIDEBAR_WIDTH = 200;
+
+export const HEADER_HEIGHT = 64;
+export const FOOTER_HEIGHT = 56;
