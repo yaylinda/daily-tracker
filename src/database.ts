@@ -9,10 +9,18 @@ import {
   serverTimestamp,
   setDoc,
   Timestamp,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 import app from "./firebase";
-import { DataKey, DayData, DayDate, UserData, YearData } from "./types";
+import {
+  DataKey,
+  DayData,
+  DayDate,
+  StarRating,
+  StarRatingDateMap,
+  UserData,
+  YearData
+} from "./types";
 import { getDateKey } from "./utils/dateUtil";
 
 // The firestore db object
@@ -33,7 +41,8 @@ export const fetchUserData = async (
 ): Promise<UserData> => {
   const dataKeys = await getDataKeys(userId);
   const yearData = await getYearData(userId, year);
-  return { dataKeys, yearData };
+  const starRatings = await getStarRatings(userId, year);
+  return { dataKeys, yearData, starRatings};
 };
 
 /**************************************
@@ -167,4 +176,56 @@ export const addDayData = async (
     deletedAt: null,
   };
   await setDoc(docRef, dayData);
+};
+
+/**************************************
+ * DAY STAR RATINGS
+ **************************************/
+
+function getUserStarRatingsCollection(userId: string, year: number) {
+  return collection(db, `${userId}_${year}_stars`);
+}
+
+/**
+ * 
+ * @param userId 
+ * @param year 
+ * @returns 
+ */
+export const getStarRatings = async (
+  userId: string,
+  year: number
+): Promise<StarRatingDateMap> => {
+  const starQuerySnapshot = await getDocs(
+    getUserStarRatingsCollection(userId, year)
+  );
+
+  const starData: StarRating[] = [];
+  starQuerySnapshot.forEach((doc) => {
+    starData.push(doc.data() as StarRating);
+  });
+
+  return starData.reduce((prev, curr) => {
+    prev[curr.dateKey] = prev[curr.rating];
+    return prev;
+  }, {} as StarRatingDateMap);
+};
+
+/**
+ * 
+ * @param userId 
+ * @param dayDate 
+ * @param rating 
+ */
+export const setStarRating = async (
+  userId: string,
+  dayDate: DayDate,
+  rating: number
+) => {
+  const dateKey = getDateKey(dayDate);
+  const docRef = doc(
+    getUserStarRatingsCollection(userId, dayDate.year),
+    dateKey
+  );
+  await setDoc(docRef, { dateKey, rating });
 };

@@ -54,9 +54,23 @@ export type YearDataMap = {
   [year in number]: YearData;
 };
 
+export interface StarRating {
+  dateKey: string;
+  rating: number;
+}
+
+export type StarRatingDateMap = {
+  [dateKey in string]: number;
+};
+
+export type YearStarRatingMap = {
+  [year in number]: StarRatingDateMap;
+};
+
 export interface UserData {
   dataKeys: DataKey[];
   yearData: YearData;
+  starRatings: StarRatingDateMap;
 }
 
 export enum NavigationTab {

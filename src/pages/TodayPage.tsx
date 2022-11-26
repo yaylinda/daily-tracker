@@ -1,3 +1,6 @@
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import {
   Avatar,
   Box,
@@ -9,16 +12,28 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
+import { useMemo } from "react";
 import DayDataChip from "../components/DayDataChip";
 import useStore from "../store";
 import theme from "../theme";
-import { NavigationTab } from "../types";
-import { getMomentFromDayDate, isToday, isYesterday } from "../utils/dateUtil";
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import {
+  getDateKey,
+  getMomentFromDayDate,
+  isToday,
+  isYesterday,
+} from "../utils/dateUtil";
 
 const TodayPage = () => {
-  const { year, month, day, navigationTab, dataKeys } = useStore();
+  const { year, month, day, dataKeys, yearDataMap } = useStore();
+
+  const numChecked = useMemo(() => {
+    const trueData = yearDataMap[year]["true"];
+    const dateKey = getDateKey({ year, month, day });
+    return Object.keys(trueData).reduce(
+      (prev, curr) => (trueData[curr].has(dateKey) ? prev + 1 : prev),
+      0
+    );
+  }, [yearDataMap, year]);
 
   return (
     <Stack
@@ -55,8 +70,17 @@ const TodayPage = () => {
                 </Typography>
               </Avatar>
             }
-            title={getMomentFromDayDate({ year, month, day }).format("MMMM")}
-            subheader={getMomentFromDayDate({ year, month, day }).format("YYYY")}
+            action={
+              <IconButton>
+                <MoreVertIcon />
+              </IconButton>
+            }
+            title={`Completed: ${numChecked} out of ${dataKeys.length}`}
+            subheader={`⭐️⭐️⭐️⭐️⭐️`}
+            // title={getMomentFromDayDate({ year, month, day }).format("MMMM")}
+            // subheader={getMomentFromDayDate({ year, month, day }).format(
+            //   "YYYY"
+            // )}
           />
           <CardContent
             sx={{
@@ -71,7 +95,9 @@ const TodayPage = () => {
               <DayDataChip key={`chip_${dataKey.id}`} dataKey={dataKey} />
             ))}
           </CardContent>
-          <CardActions sx={{ display: 'flex', justifyContent: 'space-between'}}>
+          <CardActions
+            sx={{ display: "flex", justifyContent: "space-between" }}
+          >
             <IconButton>
               <ChevronLeftIcon />
             </IconButton>
