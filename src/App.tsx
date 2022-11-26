@@ -77,6 +77,7 @@ function App() {
           <Box
             sx={{
               height: height - FOOTER_HEIGHT,
+              overflow: 'hidden'
             }}
           >
             {renderContent()}

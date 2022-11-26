@@ -8,6 +8,7 @@ import {
   query,
   serverTimestamp,
   setDoc,
+  Timestamp,
   updateDoc,
 } from "firebase/firestore";
 import app from "./firebase";
@@ -76,8 +77,8 @@ export const addDataKey = async (
 ): Promise<DataKey> => {
   const inputDataKey: Omit<DataKey, "id"> = {
     label: dataKeyLabel,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: Timestamp.now().seconds,
+    updatedAt: Timestamp.now().seconds,
     deletedAt: null,
   };
   const newDataKey = await addDoc(getDataKeyCollection(userId), inputDataKey);
@@ -161,8 +162,8 @@ export const addDayData = async (
     dataKeyId,
     value,
     dateKey,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: Timestamp.now().seconds,
+    updatedAt: Timestamp.now().seconds,
     deletedAt: null,
   };
   await setDoc(docRef, dayData);

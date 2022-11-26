@@ -2,14 +2,9 @@ import { OAuthCredential, UserCredential } from "firebase/auth";
 import { FieldValue } from "firebase/firestore";
 
 export interface Auditable {
-  createdAt: FieldValue;
-  updatedAt: FieldValue;
-  deletedAt: FieldValue | null;
-}
-
-export interface FirestoreServerTimestamp {
-  nanoseconds: number;
-  seconds: number;
+  createdAt: number;
+  updatedAt: number;
+  deletedAt: number | null;
 }
 
 export interface SignInResult {

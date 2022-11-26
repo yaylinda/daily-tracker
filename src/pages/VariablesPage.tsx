@@ -1,31 +1,38 @@
-import {
-  Stack,
-  Typography
-} from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import DataKeyItem from "../components/DataKeyItem";
 import useStore from "../store";
 import theme from "../theme";
 import { NavigationTab } from "../types";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const VariablesPage = () => {
-  const { navigationTab, dataKeys } = useStore();
-
-  if (navigationTab !== NavigationTab.VARIABLES) {
-    return null;
-  }
+  const { navigationTab, dataKeys, openAddDataKeyDialog } = useStore();
 
   return (
     <Stack
       sx={{
         color: theme.palette.text.primary,
-        paddingTop: 5,
         maxWidth: 500,
         margin: "auto",
-        gap: 4,
+        overflow: "hidden",
+        height: "100%"
       }}
     >
-      <Typography variant="h4">My Variables</Typography>
-      <Stack sx={{ gap: 2 }}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          marginTop: 4,
+          marginBottom: 2,
+        }}
+      >
+        <Typography variant="h4">My Variables</Typography>
+        <IconButton onClick={openAddDataKeyDialog}>
+          <AddCircleIcon />
+        </IconButton>
+      </Box>
+      <Stack sx={{ gap: 2, overflowY: 'scroll', marginBottom: 2}}>
         {dataKeys.map((dataKey) => (
           <DataKeyItem key={`item_${dataKey.id}`} dataKey={dataKey} />
         ))}

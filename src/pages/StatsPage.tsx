@@ -1,19 +1,23 @@
-import { Box } from "@mui/material"
+import { Stack, Typography } from "@mui/material";
 import useStore from "../store";
-import { NavigationTab } from "../types";
+import theme from "../theme";
 
 const StatsPage = () => {
   const { navigationTab } = useStore();
-  
-  if (navigationTab !== NavigationTab.VARIABLES) {
-    return null;
-  }
-  
-  return (
-    <Box>
 
-    </Box>
-  )
-}
+  return (
+    <Stack
+      sx={{
+        color: theme.palette.text.primary,
+        paddingTop: 4,
+        maxWidth: 500,
+        margin: "auto",
+        gap: 4,
+      }}
+    >
+      <Typography variant="h4">Statistics</Typography>
+    </Stack>
+  );
+};
 
 export default StatsPage;

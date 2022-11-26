@@ -152,7 +152,7 @@ const useStore = create<StoreState>()((set, get) => ({
     const dataKey = await addDataKey(get().user!.uid, dataKeyLabel);
 
     set((state) => ({
-      dataKeys: [...state.dataKeys, dataKey],
+      dataKeys: [dataKey, ...state.dataKeys],
       showAddDataKeyDialog: false,
     }));
   },
