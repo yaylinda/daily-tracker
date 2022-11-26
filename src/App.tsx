@@ -1,18 +1,13 @@
 import { ThemeProvider } from "@emotion/react";
-import FlakyIcon from "@mui/icons-material/Flaky";
 import TodayIcon from "@mui/icons-material/Today";
 import {
-  AppBar,
-  Avatar,
   BottomNavigation,
   BottomNavigationAction,
   Box,
-  Toolbar,
-  Typography,
+  LinearProgress
 } from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
-import UserAvatar from "./components/UserAvatar";
 import AddDataKeyDialog from "./dialogs/AddDataKeyDialog";
 import LogInDialog from "./dialogs/LogInDialog";
 import useWindowDimensions from "./hooks/useWindowDimensions";
@@ -22,7 +17,7 @@ import VariablesPage from "./pages/VariablesPage";
 import useStore from "./store";
 import theme from "./theme";
 import { NavigationTab } from "./types";
-import { FOOTER_HEIGHT, HEADER_HEIGHT } from "./utils/constants";
+import { FOOTER_HEIGHT } from "./utils/constants";
 
 function App() {
   const { isAuthed, loading, navigationTab, init, setNavigationTab } =
@@ -35,13 +30,14 @@ function App() {
   }, []);
 
   const renderContent = () => {
-    return (
-      <Box sx={{ height: height - FOOTER_HEIGHT }}>
-        <TodayPage />
-        <VariablesPage />
-        <StatsPage />
-      </Box>
-    );
+    switch (navigationTab) {
+      case NavigationTab.TODAY:
+        return <TodayPage />;
+      case NavigationTab.VARIABLES:
+        return <VariablesPage />;
+      case NavigationTab.STATS:
+        return <StatsPage />;
+    }
   };
 
   const renderFooter = () => {
@@ -49,19 +45,22 @@ function App() {
       <BottomNavigation
         showLabels
         value={navigationTab}
-        onChange={(event, newValue) => {
+        onChange={(_, newValue) => {
           setNavigationTab(newValue);
         }}
       >
         <BottomNavigationAction
+          value={NavigationTab.TODAY}
           label={NavigationTab.TODAY}
           icon={<TodayIcon />}
         />
         <BottomNavigationAction
+          value={NavigationTab.VARIABLES}
           label={NavigationTab.VARIABLES}
           icon={<TodayIcon />}
         />
         <BottomNavigationAction
+          value={NavigationTab.STATS}
           label={NavigationTab.STATS}
           icon={<TodayIcon />}
         />
@@ -71,9 +70,17 @@ function App() {
 
   return (
     <ThemeProvider theme={theme}>
-      {isAuthed ? (
+      {loading ? (
+        <LinearProgress />
+      ) : isAuthed ? (
         <>
-          {renderContent()}
+          <Box
+            sx={{
+              height: height - FOOTER_HEIGHT,
+            }}
+          >
+            {renderContent()}
+          </Box>
           {renderFooter()}
         </>
       ) : (

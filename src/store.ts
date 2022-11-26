@@ -6,15 +6,22 @@ import {
   getOAuthCredentialFromTokens,
   signInAnon,
   signInWithGoogle,
-  signOutAsync,
+  signOutAsync
 } from "./auth";
 import {
   addDataKey,
   addDayData,
   deleteDataKey,
-  fetchUserData,
+  fetchUserData
 } from "./database";
-import { DataKey, DayDate, NavigationTab, SignInResult, YearData, YearDataMap } from "./types";
+import {
+  DataKey,
+  DayDate,
+  NavigationTab,
+  SignInResult,
+  YearData,
+  YearDataMap
+} from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
@@ -38,10 +45,6 @@ interface StoreState {
   ) => Promise<void>;
   deleteDayData: (dayDataId: string) => void;
 
-  // TODO - can delete
-  leftScroll: number;
-  setLeftScroll: (leftScroll: number) => void;
-
   idToken: string | null;
   accessToken: string | null;
   user: User | null;
@@ -51,11 +54,13 @@ interface StoreState {
   signOut: () => void;
   linkAnonymousUser: () => void;
 
+  day: number;
   year: number;
   previousYear: () => void;
   nextYear: () => void;
   month: number;
   setMonth: (month: number) => void;
+  setDisplayDate: (year: number, month: number, day: number) => void;
 
   showLoginDialog: boolean;
   openLoginDialog: () => void;
@@ -78,7 +83,7 @@ const useStore = create<StoreState>()((set, get) => ({
   setNavigationTab: (newTab: NavigationTab) => {
     set((state) => ({
       navigationTab: newTab,
-    }))
+    }));
   },
 
   dataKeys: [],
@@ -183,10 +188,6 @@ const useStore = create<StoreState>()((set, get) => ({
   deleteDayData: (dayDataId: string) => {
     // TODO - implement deleting from firebase
   },
-
-  leftScroll: 0,
-  setLeftScroll: (leftScroll: number) =>
-    set({ leftScroll } as Partial<StoreState>),
 
   idToken: null,
   accessToken: null,
@@ -312,6 +313,7 @@ const useStore = create<StoreState>()((set, get) => ({
     );
   },
 
+  day: moment().date(),
   year: moment().year(),
   previousYear: () => {
     // TODO - fetch data for new year
@@ -324,6 +326,9 @@ const useStore = create<StoreState>()((set, get) => ({
   month: moment().month(),
   setMonth: (month) => {
     set({ month });
+  },
+  setDisplayDate(year: number, month: number, day: number) {
+    set({ year, month, day });
   },
 
   showLoginDialog: false,

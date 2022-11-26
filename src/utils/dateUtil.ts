@@ -98,3 +98,13 @@ export const getMomentFromDayDate = ({
 export const getDayDateFromMoment = (input: moment.Moment): DayDate => {
   return { year: input.year(), month: input.month(), day: input.date() };
 };
+
+export const isToday = ({ year, month, day }: DayDate): boolean => {
+  const inputMoment = getMomentFromDayDate({ year, month, day });
+  return inputMoment.isSame(moment(), "D");
+};
+
+export const isYesterday = ({ year, month, day }: DayDate): boolean => {
+  const inputMoment = getMomentFromDayDate({ year, month, day });
+  return inputMoment.isSame(moment().add(-1, "day"), "day");
+};

@@ -7,6 +7,11 @@ export interface Auditable {
   deletedAt: FieldValue | null;
 }
 
+export interface FirestoreServerTimestamp {
+  nanoseconds: number;
+  seconds: number;
+}
+
 export interface SignInResult {
   oAuthCredential: OAuthCredential | null;
   userCredential: UserCredential;
