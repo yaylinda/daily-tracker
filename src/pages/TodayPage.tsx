@@ -1,6 +1,6 @@
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import TodayIcon from "@mui/icons-material/Today";
 import {
   Avatar,
   Box,
@@ -10,21 +10,34 @@ import {
   CardHeader,
   IconButton,
   Stack,
-  Typography,
+  Typography
 } from "@mui/material";
+import { chunk } from "lodash";
+import moment from "moment";
 import { useMemo } from "react";
 import DayDataChip from "../components/DayDataChip";
 import useStore from "../store";
 import theme from "../theme";
 import {
   getDateKey,
+  getDayDateFromMoment,
   getMomentFromDayDate,
   isToday,
-  isYesterday,
+  isYesterday
 } from "../utils/dateUtil";
 
+const NUM_CHIPS_PER_ROW = 2;
+
 const TodayPage = () => {
-  const { year, month, day, dataKeys, yearDataMap } = useStore();
+  const {
+    year,
+    month,
+    day,
+    dataKeys,
+    yearDataMap,
+    openShowStarRatingDialog,
+    setDisplayDate,
+  } = useStore();
 
   const numChecked = useMemo(() => {
     const trueData = yearDataMap[year]["true"];
@@ -33,7 +46,30 @@ const TodayPage = () => {
       (prev, curr) => (trueData[curr].has(dateKey) ? prev + 1 : prev),
       0
     );
-  }, [yearDataMap, year]);
+  }, [year, month, day, yearDataMap]);
+
+  const nextDay = () => {
+    setDisplayDate(
+      getDayDateFromMoment(
+        getMomentFromDayDate({ year, month, day }).add(1, "day")
+      )
+    );
+  };
+
+  const prevDay = () => {
+    setDisplayDate(
+      getDayDateFromMoment(
+        getMomentFromDayDate({ year, month, day }).add(-1, "day")
+      )
+    );
+  };
+
+  const dayLabel = () =>
+    isToday({ year, month, day })
+      ? "Today"
+      : isYesterday({ year, month, day })
+      ? "Yesterday"
+      : getMomentFromDayDate({ year, month, day }).format("LL");
 
   return (
     <Stack
@@ -44,13 +80,6 @@ const TodayPage = () => {
         height: "100%",
       }}
     >
-      <Typography variant="h4" sx={{ marginTop: 4 }}>
-        {isToday({ year, month, day })
-          ? "Today"
-          : isYesterday({ year, month, day })
-          ? "Yesterday"
-          : getMomentFromDayDate({ year, month, day }).format("dddd")}
-      </Typography>
       <Box sx={{ display: "flex", marginTop: "auto", marginBottom: "auto" }}>
         <Card variant="outlined">
           <CardHeader
@@ -70,40 +99,43 @@ const TodayPage = () => {
                 </Typography>
               </Avatar>
             }
-            action={
-              <IconButton>
-                <MoreVertIcon />
-              </IconButton>
-            }
-            title={`Completed: ${numChecked} out of ${dataKeys.length}`}
-            subheader={`⭐️⭐️⭐️⭐️⭐️`}
-            // title={getMomentFromDayDate({ year, month, day }).format("MMMM")}
-            // subheader={getMomentFromDayDate({ year, month, day }).format(
-            //   "YYYY"
-            // )}
+            title={dayLabel()}
+            subheader={`Completed: ${numChecked} out of ${dataKeys.length}`}
           />
           <CardContent
             sx={{
               display: "flex",
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-around",
+              flexDirection: "column",
               gap: 2,
             }}
           >
-            {dataKeys.map((dataKey) => (
-              <DayDataChip key={`chip_${dataKey.id}`} dataKey={dataKey} />
+            {chunk(dataKeys, NUM_CHIPS_PER_ROW).map((chips) => (
+              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 2 }}>
+                {chips.map((dataKey) => (
+                  <DayDataChip key={`chip_${dataKey.id}`} dataKey={dataKey} />
+                ))}
+              </Box>
             ))}
           </CardContent>
           <CardActions
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            <IconButton>
+            <IconButton onClick={prevDay}>
               <ChevronLeftIcon />
             </IconButton>
-            <IconButton>
-              <ChevronRightIcon />
-            </IconButton>
+            {!isToday({ year, month, day }) &&
+              !isYesterday({ year, month, day }) && (
+                <IconButton
+                  onClick={() => setDisplayDate(getDayDateFromMoment(moment()))}
+                >
+                  <TodayIcon />
+                </IconButton>
+              )}
+            {!isToday({ year, month, day }) && (
+              <IconButton onClick={nextDay}>
+                <ChevronRightIcon />
+              </IconButton>
+            )}
           </CardActions>
         </Card>
       </Box>

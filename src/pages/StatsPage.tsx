@@ -15,7 +15,7 @@ const StatsPage = () => {
         gap: 4,
       }}
     >
-      <Typography variant="h4">Statistics</Typography>
+      <Typography variant="h6">Statistics</Typography>
     </Stack>
   );
 };

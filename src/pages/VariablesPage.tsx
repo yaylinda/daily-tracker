@@ -27,7 +27,7 @@ const VariablesPage = () => {
           marginBottom: 2,
         }}
       >
-        <Typography variant="h4">My Variables</Typography>
+        <Typography variant="h6">My Variables</Typography>
         <IconButton onClick={openAddDataKeyDialog}>
           <AddCircleIcon />
         </IconButton>

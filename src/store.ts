@@ -60,7 +60,7 @@ interface StoreState {
   nextYear: () => void;
   month: number;
   setMonth: (month: number) => void;
-  setDisplayDate: (year: number, month: number, day: number) => void;
+  setDisplayDate: (dayDate: DayDate) => void;
 
   showLoginDialog: boolean;
   openLoginDialog: () => void;
@@ -74,6 +74,10 @@ interface StoreState {
   dayDataDialogProps: { dataKey: DataKey; dayDate: DayDate } | null;
   openDayDataDialog: (dataKey: DataKey, dayDate: DayDate) => void;
   closeDayDataDialog: () => void;
+
+  showStarRatingDialog: boolean;
+  openShowStarRatingDialog: () => void;
+  closeShowStarRatingDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
@@ -327,7 +331,7 @@ const useStore = create<StoreState>()((set, get) => ({
   setMonth: (month) => {
     set({ month });
   },
-  setDisplayDate(year: number, month: number, day: number) {
+  setDisplayDate({ year, month, day}: DayDate) {
     set({ year, month, day });
   },
 
@@ -346,7 +350,6 @@ const useStore = create<StoreState>()((set, get) => ({
   showDayDataDialog: false,
   dayDataDialogProps: null,
   openDayDataDialog: (dataKey: DataKey, dayDate: DayDate) => {
-    console.log("********** opening!!!!");
     set(() => ({
       showDayDataDialog: true,
       dayDataDialogProps: { dataKey, dayDate },
@@ -354,6 +357,12 @@ const useStore = create<StoreState>()((set, get) => ({
   },
   closeDayDataDialog: () =>
     set(() => ({ showDayDataDialog: false, dayDataDialogProps: null })),
+
+  showStarRatingDialog: false,
+  openShowStarRatingDialog: () => 
+    set((state) => ({ showStarRatingDialog: true } as StoreState)),
+  closeShowStarRatingDialog: () => 
+    set((state) => ({ showStarRatingDialog: false } as StoreState)),
 }));
 
 export default useStore;

@@ -1,5 +1,7 @@
 import { ThemeProvider } from "@emotion/react";
 import TodayIcon from "@mui/icons-material/Today";
+import CodeIcon from '@mui/icons-material/Code';
+import QueryStatsIcon from '@mui/icons-material/QueryStats';
 import {
   BottomNavigation,
   BottomNavigationAction,
@@ -10,6 +12,7 @@ import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
 import AddDataKeyDialog from "./dialogs/AddDataKeyDialog";
 import LogInDialog from "./dialogs/LogInDialog";
+import StarRatingDialog from "./dialogs/StarRatingDialog";
 import useWindowDimensions from "./hooks/useWindowDimensions";
 import StatsPage from "./pages/StatsPage";
 import TodayPage from "./pages/TodayPage";
@@ -57,12 +60,12 @@ function App() {
         <BottomNavigationAction
           value={NavigationTab.VARIABLES}
           label={NavigationTab.VARIABLES}
-          icon={<TodayIcon />}
+          icon={<CodeIcon />}
         />
         <BottomNavigationAction
           value={NavigationTab.STATS}
           label={NavigationTab.STATS}
-          icon={<TodayIcon />}
+          icon={<QueryStatsIcon />}
         />
       </BottomNavigation>
     );
@@ -81,14 +84,16 @@ function App() {
             }}
           >
             {renderContent()}
+            <StarRatingDialog />
           </Box>
           {renderFooter()}
         </>
       ) : (
+        <>
         <LoggedOutView />
+        <LogInDialog />
+        </>
       )}
-      <LogInDialog />
-      <AddDataKeyDialog />
     </ThemeProvider>
   );
 }
