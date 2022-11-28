@@ -1,12 +1,14 @@
-import { Box, IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import DataKeyItem from "../components/DataKeyItem";
 import useStore from "../store";
 import theme from "../theme";
 import { NavigationTab } from "../types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import { isEmpty } from "lodash";
+import Zoom from '@mui/material/Zoom';
 
 const VariablesPage = () => {
-  const { navigationTab, dataKeys, openAddDataKeyDialog } = useStore();
+  const { dataKeys, openAddDataKeyDialog } = useStore();
 
   return (
     <Stack
@@ -15,7 +17,7 @@ const VariablesPage = () => {
         maxWidth: 500,
         margin: "auto",
         overflow: "hidden",
-        height: "100%"
+        height: "100%",
       }}
     >
       <Box
@@ -27,12 +29,22 @@ const VariablesPage = () => {
           marginBottom: 2,
         }}
       >
-        <Typography variant="h6">My Variables</Typography>
-        <IconButton onClick={openAddDataKeyDialog}>
-          <AddCircleIcon />
-        </IconButton>
+        <Typography variant="h6">My Life Variables</Typography>
+        <Tooltip title="Add new Life Variable" TransitionComponent={Zoom}>
+          <IconButton onClick={openAddDataKeyDialog}>
+            <AddCircleIcon />
+          </IconButton>
+        </Tooltip>
       </Box>
-      <Stack sx={{ gap: 2, overflowY: 'scroll', marginBottom: 2}}>
+      {isEmpty(dataKeys) && (
+        <Typography
+          variant="caption"
+          sx={{ textAlign: "center", color: theme.palette.text.secondary }}
+        >
+          No variables yet.
+        </Typography>
+      )}
+      <Stack sx={{ gap: 2, overflowY: "scroll", marginBottom: 2 }}>
         {dataKeys.map((dataKey) => (
           <DataKeyItem key={`item_${dataKey.id}`} dataKey={dataKey} />
         ))}

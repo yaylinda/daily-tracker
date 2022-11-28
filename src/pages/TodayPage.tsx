@@ -1,32 +1,62 @@
+import AddIcon from "@mui/icons-material/Add";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TodayIcon from "@mui/icons-material/Today";
 import {
   Avatar,
   Box,
+  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
+  Chip,
   IconButton,
   Stack,
-  Typography
+  Tooltip,
+  Typography,
+  Zoom,
 } from "@mui/material";
-import { chunk } from "lodash";
+import { chunk, isEmpty } from "lodash";
 import moment from "moment";
 import { useMemo } from "react";
 import DayDataChip from "../components/DayDataChip";
 import useStore from "../store";
 import theme from "../theme";
+import { DataKey } from "../types";
 import {
   getDateKey,
   getDayDateFromMoment,
   getMomentFromDayDate,
   isToday,
-  isYesterday
+  isYesterday,
 } from "../utils/dateUtil";
 
 const NUM_CHIPS_PER_ROW = 2;
+
+const AddLifeVariableChip = () => {
+  const { openAddDataKeyDialog } = useStore();
+
+  return (
+    <Chip
+      sx={{
+        width: 200,
+        justifyContent: "flex-start",
+        borderStyle: "dashed",
+        color: theme.palette.text.secondary,
+      }}
+      label="Add Life Variable"
+      onClick={openAddDataKeyDialog}
+      avatar={
+        <Avatar sx={{ background: "none" }}>
+          <AddIcon sx={{ color: theme.palette.text.secondary }} />
+        </Avatar>
+      }
+      variant="outlined"
+      clickable
+    />
+  );
+};
 
 const TodayPage = () => {
   const {
@@ -35,7 +65,7 @@ const TodayPage = () => {
     day,
     dataKeys,
     yearDataMap,
-    openShowStarRatingDialog,
+    openAddDataKeyDialog,
     setDisplayDate,
   } = useStore();
 
@@ -48,23 +78,13 @@ const TodayPage = () => {
     );
   }, [year, month, day, yearDataMap]);
 
-  const nextDay = () => {
-    setDisplayDate(
-      getDayDateFromMoment(
-        getMomentFromDayDate({ year, month, day }).add(1, "day")
-      )
-    );
-  };
+  const nextDay = () =>
+    getMomentFromDayDate({ year, month, day }).add(1, "day");
 
-  const prevDay = () => {
-    setDisplayDate(
-      getDayDateFromMoment(
-        getMomentFromDayDate({ year, month, day }).add(-1, "day")
-      )
-    );
-  };
+  const prevDay = () =>
+    getMomentFromDayDate({ year, month, day }).add(-1, "day");
 
-  const dayLabel = () =>
+  const currentDayLabel = () =>
     isToday({ year, month, day })
       ? "Today"
       : isYesterday({ year, month, day })
@@ -81,7 +101,7 @@ const TodayPage = () => {
       }}
     >
       <Box sx={{ display: "flex", marginTop: "auto", marginBottom: "auto" }}>
-        <Card variant="outlined">
+        <Card variant="outlined" sx={{ width: "100%" }}>
           <CardHeader
             sx={{ color: theme.palette.text.primary }}
             avatar={
@@ -99,7 +119,7 @@ const TodayPage = () => {
                 </Typography>
               </Avatar>
             }
-            title={dayLabel()}
+            title={currentDayLabel()}
             subheader={`Completed: ${numChecked} out of ${dataKeys.length}`}
           />
           <CardContent
@@ -109,32 +129,69 @@ const TodayPage = () => {
               gap: 2,
             }}
           >
-            {chunk(dataKeys, NUM_CHIPS_PER_ROW).map((chips) => (
-              <Box sx={{ display: "flex", flexDirection: "row", justifyContent: "space-between", gap: 2 }}>
-                {chips.map((dataKey) => (
-                  <DayDataChip key={`chip_${dataKey.id}`} dataKey={dataKey} />
-                ))}
+            {isEmpty(dataKeys) && (
+              <Button onClick={openAddDataKeyDialog}>
+                Add Life Variables to track
+              </Button>
+            )}
+            {chunk([...dataKeys, {}], NUM_CHIPS_PER_ROW).map((chips) => (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 2,
+                }}
+              >
+                {chips.map((dataKey, index) =>
+                  isEmpty(dataKey) ? (
+                    <AddLifeVariableChip />
+                  ) : (
+                    <DayDataChip
+                      key={`chip_${(dataKey as DataKey).id}`}
+                      dataKey={dataKey as DataKey}
+                      tooltipPlacement={index ? 'right' : 'left'}
+                    />
+                  )
+                )}
               </Box>
             ))}
           </CardContent>
           <CardActions
             sx={{ display: "flex", justifyContent: "space-between" }}
           >
-            <IconButton onClick={prevDay}>
-              <ChevronLeftIcon />
-            </IconButton>
-            {!isToday({ year, month, day }) &&
-              !isYesterday({ year, month, day }) && (
+            <Tooltip
+              title={`Go to ${prevDay().format("ll")}`}
+              TransitionComponent={Zoom}
+            >
+              <IconButton
+                onClick={() => setDisplayDate(getDayDateFromMoment(prevDay()))}
+              >
+                <ChevronLeftIcon />
+              </IconButton>
+            </Tooltip>
+            {!isToday({ year, month, day }) && (
+              <Tooltip title="Go to Today" TransitionComponent={Zoom}>
                 <IconButton
                   onClick={() => setDisplayDate(getDayDateFromMoment(moment()))}
                 >
                   <TodayIcon />
                 </IconButton>
-              )}
+              </Tooltip>
+            )}
             {!isToday({ year, month, day }) && (
-              <IconButton onClick={nextDay}>
-                <ChevronRightIcon />
-              </IconButton>
+              <Tooltip
+                title={`Go to ${nextDay().format("ll")}`}
+                TransitionComponent={Zoom}
+              >
+                <IconButton
+                  onClick={() =>
+                    setDisplayDate(getDayDateFromMoment(nextDay()))
+                  }
+                >
+                  <ChevronRightIcon />
+                </IconButton>
+              </Tooltip>
             )}
           </CardActions>
         </Card>

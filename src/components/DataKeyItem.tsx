@@ -13,7 +13,7 @@ const DataKeyItem = ({ dataKey }: { dataKey: DataKey}) => {
       <CardHeader 
         avatar={<Avatar sx={{ backgroundColor: color}}>{' '}</Avatar>}
         title={dataKey.label}
-        subheader={moment(dataKey.updatedAt, 'X').fromNow()}
+        subheader={moment(dataKey.createdAt, 'X').fromNow()}
       />
     </Card>
   )

@@ -35,7 +35,7 @@ const AddDataKeyDialog = () => {
       open={showAddDataKeyDialog}
       TransitionComponent={DialogTransition}
     >
-      <DialogTitle>New Life Attribute</DialogTitle>
+      <DialogTitle>New Life Variable</DialogTitle>
       <DialogContent>
         <TextField
           variant="standard"

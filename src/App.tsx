@@ -84,6 +84,7 @@ function App() {
             }}
           >
             {renderContent()}
+            <AddDataKeyDialog />
             <StarRatingDialog />
           </Box>
           {renderFooter()}
