@@ -1,17 +1,21 @@
 import { Avatar, Chip, CircularProgress, Tooltip, Zoom } from "@mui/material";
+import moment from "moment";
 import { useState } from "react";
 import useStore from "../store";
 import theme from "../theme";
 import { DataKey } from "../types";
 import { stringToColor } from "../utils/colorUtil";
+import { getMomentFromDayDate } from "../utils/dateUtil";
 import { getDayData } from "../utils/yearDataUtils";
 
 const DayDataChip = ({
   dataKey,
   tooltipPlacement,
+  isToday,
 }: {
   dataKey: DataKey;
   tooltipPlacement: "left" | "right";
+  isToday: boolean;
 }) => {
   const [saving, setSaving] = useState<boolean>(false);
 
@@ -40,7 +44,7 @@ const DayDataChip = ({
 
   return (
     <Tooltip
-      title={saving ? "Saving..." : isTrue ? "Undo mark as Complete" : "Mark as Complete"}
+      title={isToday ? saving ? "Saving..." : isTrue ? "Undo mark as Complete" : "Mark as Complete" : 'Cannot edit data in the past'}
       placement={tooltipPlacement}
       TransitionComponent={Zoom}
       arrow
@@ -76,8 +80,8 @@ const DayDataChip = ({
         }
         label={dataKey.label}
         variant={isTrue ? undefined : "outlined"}
-        onClick={updateData}
-        clickable
+        onClick={() => isToday ? updateData() : undefined}
+        clickable={isToday}
       />
     </Tooltip>
   );

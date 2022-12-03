@@ -69,7 +69,8 @@ const TodayPage = () => {
     setDisplayDate,
   } = useStore();
 
-  const numChecked = useMemo(() => {
+  // Number of variables that got marked as completed on this day
+  const numCompleted = useMemo(() => {
     const trueData = yearDataMap[year]["true"];
     const dateKey = getDateKey({ year, month, day });
     return Object.keys(trueData).reduce(
@@ -77,6 +78,18 @@ const TodayPage = () => {
       0
     );
   }, [year, month, day, yearDataMap]);
+
+  // The variables that were created on or before this day, that are available for tracking
+  const dataKeysToShow = useMemo(
+    () =>
+      dataKeys.filter((dataKey) =>
+        moment(dataKey.createdAt, "X").isSameOrBefore(
+          getMomentFromDayDate({ year, month, day }),
+          "day"
+        )
+      ),
+    [year, month, day, dataKeys]
+  );
 
   const nextDay = () =>
     getMomentFromDayDate({ year, month, day }).add(1, "day");
@@ -120,7 +133,7 @@ const TodayPage = () => {
               </Avatar>
             }
             title={currentDayLabel()}
-            subheader={`Completed: ${numChecked} out of ${dataKeys.length}`}
+            subheader={`Completed: ${numCompleted} out of ${dataKeysToShow.length}`}
           />
           <CardContent
             sx={{
@@ -129,12 +142,23 @@ const TodayPage = () => {
               gap: 2,
             }}
           >
-            {isEmpty(dataKeys) && (
-              <Button onClick={openAddDataKeyDialog}>
-                Add Life Variables to track
-              </Button>
-            )}
-            {chunk([...dataKeys, {}], NUM_CHIPS_PER_ROW).map((chips) => (
+            {isEmpty(dataKeysToShow) &&
+              (isToday({ year, month, day }) ? (
+                <Button onClick={openAddDataKeyDialog}>
+                  Add Life Variables to track
+                </Button>
+              ) : (
+                <Typography
+                  variant="caption"
+                  sx={{
+                    textAlign: "center",
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  No data
+                </Typography>
+              ))}
+            {chunk([...dataKeysToShow, {}], NUM_CHIPS_PER_ROW).map((chips) => (
               <Box
                 sx={{
                   display: "flex",
@@ -145,12 +169,13 @@ const TodayPage = () => {
               >
                 {chips.map((dataKey, index) =>
                   isEmpty(dataKey) ? (
-                    <AddLifeVariableChip />
+                    isToday({ year, month, day }) && <AddLifeVariableChip />
                   ) : (
                     <DayDataChip
                       key={`chip_${(dataKey as DataKey).id}`}
                       dataKey={dataKey as DataKey}
-                      tooltipPlacement={index ? 'right' : 'left'}
+                      tooltipPlacement={index ? "right" : "left"}
+                      isToday={isToday({ year, month, day })}
                     />
                   )
                 )}
@@ -163,6 +188,7 @@ const TodayPage = () => {
             <Tooltip
               title={`Go to ${prevDay().format("ll")}`}
               TransitionComponent={Zoom}
+              arrow
             >
               <IconButton
                 onClick={() => setDisplayDate(getDayDateFromMoment(prevDay()))}
@@ -171,7 +197,7 @@ const TodayPage = () => {
               </IconButton>
             </Tooltip>
             {!isToday({ year, month, day }) && (
-              <Tooltip title="Go to Today" TransitionComponent={Zoom}>
+              <Tooltip title="Go to Today" TransitionComponent={Zoom} arrow>
                 <IconButton
                   onClick={() => setDisplayDate(getDayDateFromMoment(moment()))}
                 >
@@ -183,6 +209,7 @@ const TodayPage = () => {
               <Tooltip
                 title={`Go to ${nextDay().format("ll")}`}
                 TransitionComponent={Zoom}
+                arrow
               >
                 <IconButton
                   onClick={() =>

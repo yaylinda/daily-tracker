@@ -62,11 +62,11 @@ function App() {
           label={NavigationTab.VARIABLES}
           icon={<CodeIcon />}
         />
-        <BottomNavigationAction
+        {/* <BottomNavigationAction
           value={NavigationTab.STATS}
           label={NavigationTab.STATS}
           icon={<QueryStatsIcon />}
-        />
+        /> */}
       </BottomNavigation>
     );
   };
