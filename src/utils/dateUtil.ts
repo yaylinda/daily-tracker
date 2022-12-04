@@ -54,6 +54,39 @@ export const getDaysInMonth = (year: number, month: number): DayInMonth[][] => {
 };
 
 /**
+ * 
+ * @param year 
+ * @returns 
+ */
+export const getWeekChunksForYearGrid = (year: number): DayDate[][] => {
+  const yearMoment = moment(new Date(year, 0, 1)).startOf('year');
+
+  const daysBeforeYear: DayDate[] = Array.from(
+    Array(yearMoment.weekday()),
+    (_, i) => ({ ...PADDING_DAY })
+  );
+
+  const daysAfterYear: DayDate[] = Array.from(
+    Array(NUM_DAYS_IN_WEEK - (yearMoment.endOf("year").weekday() + 1)),
+    (_, i) => ({ ...PADDING_DAY })
+  );
+  
+  const daysInYear: DayDate[] = [];
+  let iterYearMoment = yearMoment.startOf('year').clone();
+  while (iterYearMoment.year() === year) {
+    daysInYear.push(getDayDateFromMoment(iterYearMoment));
+    iterYearMoment = iterYearMoment.add(1, 'day');
+  }
+
+  const chunks = chunk(
+    [...daysBeforeYear, ...daysInYear, ...daysAfterYear],
+    NUM_DAYS_IN_WEEK
+  );
+
+  return chunks;
+}
+
+/**
  *
  * @returns
  */

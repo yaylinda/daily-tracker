@@ -14,10 +14,16 @@ const VariablesPage = () => {
     <Stack
       sx={{
         color: theme.palette.text.primary,
-        maxWidth: 500,
+        maxWidth: 800,
         margin: "auto",
         overflow: "hidden",
         height: "100%",
+        '&::-webkit-scrollbar': {
+          background: 'transparent', 
+          display: 'none',
+          width: 0,
+          height: 0,
+        }
       }}
     >
       <Box
