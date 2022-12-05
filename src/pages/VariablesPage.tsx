@@ -2,7 +2,6 @@ import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
 import DataKeyItem from "../components/DataKeyItem";
 import useStore from "../store";
 import theme from "../theme";
-import { NavigationTab } from "../types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { isEmpty } from "lodash";
 import Zoom from '@mui/material/Zoom';

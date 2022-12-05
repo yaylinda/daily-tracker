@@ -158,8 +158,9 @@ const TodayPage = () => {
                   No data
                 </Typography>
               ))}
-            {chunk([...dataKeysToShow, {}], NUM_CHIPS_PER_ROW).map((chips) => (
+            {chunk([...dataKeysToShow, {}], NUM_CHIPS_PER_ROW).map((chips, row_num) => (
               <Box
+                key={`row_${row_num}`}
                 sx={{
                   display: "flex",
                   flexDirection: "row",
@@ -169,7 +170,7 @@ const TodayPage = () => {
               >
                 {chips.map((dataKey, index) =>
                   isEmpty(dataKey) ? (
-                    isToday({ year, month, day }) && <AddLifeVariableChip />
+                    isToday({ year, month, day }) && <AddLifeVariableChip key={`add_chip`}/>
                   ) : (
                     <DayDataChip
                       key={`chip_${(dataKey as DataKey).id}`}

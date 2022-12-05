@@ -57,7 +57,7 @@ const DataKeyItem = ({ dataKey }: { dataKey: DataKey }) => {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           {Object.keys(yearDataMap).map((year) => (
-            <YearGrid year={parseInt(year)} />
+            <YearGrid key={year} year={parseInt(year)} dataKey={dataKey} />
           ))}
         </CardContent>
       </Collapse>
