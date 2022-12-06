@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/life-as-booleans/static/css/main.77c255a8.css",
-    "main.js": "/life-as-booleans/static/js/main.60c68f15.js",
+    "main.js": "/life-as-booleans/static/js/main.e9b969f7.js",
     "static/js/496.9bfe6f75.chunk.js": "/life-as-booleans/static/js/496.9bfe6f75.chunk.js",
     "index.html": "/life-as-booleans/index.html",
     "main.77c255a8.css.map": "/life-as-booleans/static/css/main.77c255a8.css.map",
-    "main.60c68f15.js.map": "/life-as-booleans/static/js/main.60c68f15.js.map",
+    "main.e9b969f7.js.map": "/life-as-booleans/static/js/main.e9b969f7.js.map",
     "496.9bfe6f75.chunk.js.map": "/life-as-booleans/static/js/496.9bfe6f75.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.77c255a8.css",
-    "static/js/main.60c68f15.js"
+    "static/js/main.e9b969f7.js"
   ]
 }
