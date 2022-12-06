@@ -14,6 +14,7 @@ import { useState } from "react";
 import useStore from "../store";
 import { LifeVariable } from "../types";
 import { stringToColor } from "../utils/colorUtil";
+import { getMomentFromDayDate } from "../utils/dateUtil";
 import YearGrid from "./YearGrid";
 
 const LifeVariableCard = ({ lifeVariable }: { lifeVariable: LifeVariable }) => {
@@ -24,7 +25,7 @@ const LifeVariableCard = ({ lifeVariable }: { lifeVariable: LifeVariable }) => {
   const color = stringToColor(lifeVariable.id);
 
   const numDaysSinceCreated =
-    moment().diff(moment(lifeVariable.createdAt, "X"), "day") + 1;
+    moment().diff(getMomentFromDayDate(lifeVariable.createdAt), "day") + 1;
 
   const completedDays = Object.keys(yearDataMap).reduce(
     (prev: Set<string>, curr: string) =>

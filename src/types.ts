@@ -1,10 +1,9 @@
 import { OAuthCredential, UserCredential } from "firebase/auth";
-import { FieldValue } from "firebase/firestore";
 
 export interface Auditable {
-  createdAt: number;
-  updatedAt: number;
-  deletedAt: number | null;
+  createdAt: DayDate;
+  updatedAt: DayDate;
+  deletedAt: DayDate | null;
 }
 
 export interface SignInResult {
@@ -16,10 +15,6 @@ export interface DayDate {
   year: number;
   month: number; // [0, 11] -> [Jan, Dec]
   day: number;
-}
-
-export interface DayInMonth extends DayDate {
-  data?: DayData;
 }
 
 export interface DayData extends DayDate, Auditable {

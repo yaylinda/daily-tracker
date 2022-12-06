@@ -24,12 +24,12 @@ const YearGridDayCell = ({ dayDate, lifeVariable }: YearGridDayCellProps) => {
   const cellSize =
     dayDate.year === -1 ? CELL_SIZE + 2 * CELL_BORDER : CELL_SIZE;
 
-  const created = moment(lifeVariable.createdAt, "X").isSameOrBefore(
+  const created = getMomentFromDayDate(lifeVariable.createdAt).isSameOrBefore(
     getMomentFromDayDate({ ...dayDate }),
     "day"
   );
 
-  const afterToday = getMomentFromDayDate({ ...dayDate }).isAfter(
+  const afterToday = getMomentFromDayDate(dayDate).isAfter(
     moment(),
     "day"
   );

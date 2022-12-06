@@ -6,22 +6,21 @@ import {
   getFirestore,
   orderBy,
   query,
-  serverTimestamp,
   setDoc,
-  Timestamp,
-  updateDoc
+  updateDoc,
 } from "firebase/firestore";
+import moment from "moment";
 import app from "./firebase";
 import {
-  LifeVariable,
   DayData,
   DayDate,
+  LifeVariable,
   StarRating,
   StarRatingDateMap,
   UserData,
-  YearData
+  YearData,
 } from "./types";
-import { getDateKey } from "./utils/dateUtil";
+import { getDateKey, getDayDateFromMoment } from "./utils/dateUtil";
 
 // The firestore db object
 const db = getFirestore(app);
@@ -42,7 +41,7 @@ export const fetchUserData = async (
   const lifeVariables = await getLifeVariables(userId);
   const yearData = await getYearData(userId, year);
   const starRatings = await getStarRatings(userId, year);
-  return { lifeVariables, yearData, starRatings};
+  return { lifeVariables, yearData, starRatings };
 };
 
 /**************************************
@@ -58,13 +57,15 @@ function getLifeVariableCollection(userId: string) {
  * @param userId
  * @returns
  */
-export const getLifeVariables = async (userId: string): Promise<LifeVariable[]> => {
+export const getLifeVariables = async (
+  userId: string
+): Promise<LifeVariable[]> => {
   const querySnapshot = await getDocs(
     query(getLifeVariableCollection(userId), orderBy("createdAt"))
   );
 
   const lifeVariables: LifeVariable[] = [];
-  
+
   querySnapshot.forEach((doc) => {
     lifeVariables.push({
       ...(doc.data() as Omit<LifeVariable, "id">),
@@ -87,11 +88,14 @@ export const addLifeVariable = async (
 ): Promise<LifeVariable> => {
   const inputLifeVariable: Omit<LifeVariable, "id"> = {
     label: lifeVariableLabel,
-    createdAt: Timestamp.now().seconds,
-    updatedAt: Timestamp.now().seconds,
+    createdAt: getDayDateFromMoment(moment()),
+    updatedAt: getDayDateFromMoment(moment()),
     deletedAt: null,
   };
-  const newLifeVariable = await addDoc(getLifeVariableCollection(userId), inputLifeVariable);
+  const newLifeVariable = await addDoc(
+    getLifeVariableCollection(userId),
+    inputLifeVariable
+  );
   return {
     ...inputLifeVariable,
     id: newLifeVariable.id,
@@ -103,9 +107,12 @@ export const addLifeVariable = async (
  * @param lifeVariableId
  * @returns
  */
-export const deleteLifeVariable = async (userId: string, lifeVariableId: string) => {
+export const deleteLifeVariable = async (
+  userId: string,
+  lifeVariableId: string
+) => {
   const docRef = doc(getLifeVariableCollection(userId), lifeVariableId);
-  return await updateDoc(docRef, { deletedAt: serverTimestamp() });
+  return await updateDoc(docRef, { deletedAt: getDayDateFromMoment(moment()) });
 };
 
 /**************************************
@@ -172,8 +179,8 @@ export const addDayData = async (
     lifeVariableId,
     value,
     dateKey,
-    createdAt: Timestamp.now().seconds,
-    updatedAt: Timestamp.now().seconds,
+    createdAt: getDayDateFromMoment(moment()),
+    updatedAt: getDayDateFromMoment(moment()),
     deletedAt: null,
   };
   await setDoc(docRef, dayData);
@@ -188,10 +195,10 @@ function getUserStarRatingsCollection(userId: string, year: number) {
 }
 
 /**
- * 
- * @param userId 
- * @param year 
- * @returns 
+ *
+ * @param userId
+ * @param year
+ * @returns
  */
 export const getStarRatings = async (
   userId: string,
@@ -213,10 +220,10 @@ export const getStarRatings = async (
 };
 
 /**
- * 
- * @param userId 
- * @param dayDate 
- * @param rating 
+ *
+ * @param userId
+ * @param dayDate
+ * @param rating
  */
 export const setStarRating = async (
   userId: string,
