@@ -83,7 +83,7 @@ const TodayPage = () => {
   const lifeVariablesToShow = useMemo(
     () =>
       lifeVariables.filter((lifeVariable) =>
-        moment(lifeVariable.createdAt, "X").isSameOrBefore(
+        getMomentFromDayDate(lifeVariable.createdAt).isSameOrBefore(
           getMomentFromDayDate({ year, month, day }),
           "day"
         )
@@ -142,46 +142,45 @@ const TodayPage = () => {
               gap: 2,
             }}
           >
-            {isEmpty(lifeVariablesToShow) &&
-              (isToday({ year, month, day }) ? (
-                <Button onClick={openAddLifeVariableDialog}>
-                  Add Life Variables to track
-                </Button>
-              ) : (
-                <Typography
-                  variant="caption"
-                  sx={{
-                    textAlign: "center",
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  No data
-                </Typography>
-              ))}
-            {chunk([...lifeVariablesToShow, {}], NUM_CHIPS_PER_ROW).map((chips, row_num) => (
-              <Box
-                key={`row_${row_num}`}
+            {isEmpty(lifeVariablesToShow) && !isToday({ year, month, day }) && (
+              <Typography
+                variant="caption"
                 sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  gap: 2,
+                  textAlign: "center",
+                  color: theme.palette.text.secondary,
                 }}
               >
-                {chips.map((lifeVariable, index) =>
-                  isEmpty(lifeVariable) ? (
-                    isToday({ year, month, day }) && <AddLifeVariableChip key={`add_chip`}/>
-                  ) : (
-                    <DayDataChip
-                      key={`chip_${(lifeVariable as LifeVariable).id}`}
-                      lifeVariable={lifeVariable as LifeVariable}
-                      tooltipPlacement={index ? "right" : "left"}
-                      isToday={isToday({ year, month, day })}
-                    />
-                  )
-                )}
-              </Box>
-            ))}
+                No data
+              </Typography>
+            )}
+            {chunk([...lifeVariablesToShow, {}], NUM_CHIPS_PER_ROW).map(
+              (chips, row_num) => (
+                <Box
+                  key={`row_${row_num}`}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    gap: 2,
+                  }}
+                >
+                  {chips.map((lifeVariable, index) =>
+                    isEmpty(lifeVariable) ? (
+                      isToday({ year, month, day }) && (
+                        <AddLifeVariableChip key={`add_chip`} />
+                      )
+                    ) : (
+                      <DayDataChip
+                        key={`chip_${(lifeVariable as LifeVariable).id}`}
+                        lifeVariable={lifeVariable as LifeVariable}
+                        tooltipPlacement={index ? "right" : "left"}
+                        isToday={isToday({ year, month, day })}
+                      />
+                    )
+                  )}
+                </Box>
+              )
+            )}
           </CardContent>
           <CardActions
             sx={{ display: "flex", justifyContent: "space-between" }}
