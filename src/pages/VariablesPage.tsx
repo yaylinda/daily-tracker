@@ -1,5 +1,5 @@
 import { Box, IconButton, Stack, Tooltip, Typography } from "@mui/material";
-import DataKeyItem from "../components/DataKeyItem";
+import VariableCard from "../components/VariableCard";
 import useStore from "../store";
 import theme from "../theme";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -51,7 +51,7 @@ const VariablesPage = () => {
       )}
       <Stack sx={{ gap: 2, overflowY: "scroll", marginBottom: 2 }}>
         {dataKeys.map((dataKey) => (
-          <DataKeyItem key={`item_${dataKey.id}`} dataKey={dataKey} />
+          <VariableCard key={`item_${dataKey.id}`} dataKey={dataKey} />
         ))}
       </Stack>
     </Stack>

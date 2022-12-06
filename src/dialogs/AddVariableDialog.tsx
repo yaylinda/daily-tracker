@@ -1,10 +1,10 @@
 import { Dialog, DialogContent, DialogTitle, TextField } from "@mui/material";
 import React from "react";
 import useStore from "../store";
-import DialogActionButtons from "./dialogComponents/DialogActionButtons";
-import DialogTransition from "./dialogComponents/DialogTransition";
+import DialogActionButtons from "./DialogActionButtons";
+import DialogTransition from "./DialogTransition";
 
-const AddDataKeyDialog = () => {
+const AddVariableDialog = () => {
   const { showAddDataKeyDialog, closeAddDataKeyDialog, addDataKey } =
     useStore();
 
@@ -54,4 +54,4 @@ const AddDataKeyDialog = () => {
   );
 };
 
-export default AddDataKeyDialog;
+export default AddVariableDialog;

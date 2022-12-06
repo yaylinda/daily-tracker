@@ -1,7 +1,7 @@
 import GoogleIcon from "@mui/icons-material/Google";
 import { Button, Dialog, DialogContent } from "@mui/material";
 import useStore from "../store";
-import DialogTransition from "./dialogComponents/DialogTransition";
+import DialogTransition from "./DialogTransition";
 
 const LogInDialog = () => {
   const { showLoginDialog, closeLoginDialog, isAuthed, isAnon, signIn } =

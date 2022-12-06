@@ -16,7 +16,7 @@ import { DataKey } from "../types";
 import { stringToColor } from "../utils/colorUtil";
 import YearGrid from "./YearGrid";
 
-const DataKeyItem = ({ dataKey }: { dataKey: DataKey }) => {
+const VariableCard = ({ dataKey }: { dataKey: DataKey }) => {
   const { yearDataMap } = useStore();
 
   const [expanded, setExpanded] = useState(false);
@@ -70,4 +70,4 @@ const DataKeyItem = ({ dataKey }: { dataKey: DataKey }) => {
   );
 };
 
-export default DataKeyItem;
+export default VariableCard;

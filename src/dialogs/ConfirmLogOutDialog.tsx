@@ -1,7 +1,7 @@
 import { Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
 import useStore from "../store";
-import DialogActionButtons from "./dialogComponents/DialogActionButtons";
-import DialogTransition from "./dialogComponents/DialogTransition";
+import DialogActionButtons from "./DialogActionButtons";
+import DialogTransition from "./DialogTransition";
 
 interface ConfirmLogOutDialogProps {
   open: boolean;

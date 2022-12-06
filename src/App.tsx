@@ -1,20 +1,17 @@
 import { ThemeProvider } from "@emotion/react";
 import TodayIcon from "@mui/icons-material/Today";
-import CodeIcon from '@mui/icons-material/Code';
-import QueryStatsIcon from '@mui/icons-material/QueryStats';
+import CodeIcon from "@mui/icons-material/Code";
 import {
   BottomNavigation,
   BottomNavigationAction,
   Box,
-  LinearProgress
+  LinearProgress,
 } from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
-import AddDataKeyDialog from "./dialogs/AddDataKeyDialog";
+import AddVariableDialog from "./dialogs/AddVariableDialog";
 import LogInDialog from "./dialogs/LogInDialog";
-import StarRatingDialog from "./dialogs/StarRatingDialog";
 import useWindowDimensions from "./hooks/useWindowDimensions";
-import StatsPage from "./pages/StatsPage";
 import TodayPage from "./pages/TodayPage";
 import VariablesPage from "./pages/VariablesPage";
 import useStore from "./store";
@@ -38,8 +35,6 @@ function App() {
         return <TodayPage />;
       case NavigationTab.VARIABLES:
         return <VariablesPage />;
-      case NavigationTab.STATS:
-        return <StatsPage />;
     }
   };
 
@@ -62,11 +57,6 @@ function App() {
           label={NavigationTab.VARIABLES}
           icon={<CodeIcon />}
         />
-        {/* <BottomNavigationAction
-          value={NavigationTab.STATS}
-          label={NavigationTab.STATS}
-          icon={<QueryStatsIcon />}
-        /> */}
       </BottomNavigation>
     );
   };
@@ -80,19 +70,18 @@ function App() {
           <Box
             sx={{
               height: height - FOOTER_HEIGHT,
-              overflow: 'hidden'
+              overflow: "hidden",
             }}
           >
             {renderContent()}
-            <AddDataKeyDialog />
-            <StarRatingDialog />
+            <AddVariableDialog />
           </Box>
           {renderFooter()}
         </>
       ) : (
         <>
-        <LoggedOutView />
-        <LogInDialog />
+          <LoggedOutView />
+          <LogInDialog />
         </>
       )}
     </ThemeProvider>
