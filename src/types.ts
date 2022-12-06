@@ -1,10 +1,9 @@
 import { OAuthCredential, UserCredential } from "firebase/auth";
-import { FieldValue } from "firebase/firestore";
 
 export interface Auditable {
-  createdAt: FieldValue;
-  updatedAt: FieldValue;
-  deletedAt: FieldValue | null;
+  createdAt: DayDate;
+  updatedAt: DayDate;
+  deletedAt: DayDate | null;
 }
 
 export interface SignInResult {
@@ -18,22 +17,18 @@ export interface DayDate {
   day: number;
 }
 
-export interface DayInMonth extends DayDate {
-  data?: DayData;
-}
-
 export interface DayData extends DayDate, Auditable {
-  dataKeyId: string;
+  lifeVariableId: string;
   value: boolean;
   dateKey: string;
 }
 
-export interface DataKey extends Auditable {
+export interface LifeVariable extends Auditable {
   id: string;
   label: string;
 }
 
-export type DataKeyDateMap = { [dataKeyId in string]: Set<string> };
+export type LifeVariableDateMap = { [lifeVariableId in string]: Set<string> };
 
 /**
  * Example:
@@ -47,14 +42,33 @@ export type DataKeyDateMap = { [dataKeyId in string]: Set<string> };
  * }
  */
 export type YearData = {
-  [valueStr in string]: DataKeyDateMap;
+  [valueStr in string]: LifeVariableDateMap;
 };
 
 export type YearDataMap = {
   [year in number]: YearData;
 };
 
+export interface StarRating {
+  dateKey: string;
+  rating: number;
+}
+
+export type StarRatingDateMap = {
+  [dateKey in string]: number;
+};
+
+export type YearStarRatingMap = {
+  [year in number]: StarRatingDateMap;
+};
+
 export interface UserData {
-  dataKeys: DataKey[];
+  lifeVariables: LifeVariable[];
   yearData: YearData;
+  starRatings: StarRatingDateMap;
+}
+
+export enum NavigationTab {
+  TODAY = "Today",
+  VARIABLES = "Variables",
 }

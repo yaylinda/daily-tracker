@@ -6,15 +6,22 @@ import {
   getOAuthCredentialFromTokens,
   signInAnon,
   signInWithGoogle,
-  signOutAsync,
+  signOutAsync
 } from "./auth";
 import {
-  addDataKey,
+  addLifeVariable,
   addDayData,
-  deleteDataKey,
-  fetchUserData,
+  deleteLifeVariable,
+  fetchUserData
 } from "./database";
-import { DataKey, DayDate, SignInResult, YearData, YearDataMap } from "./types";
+import {
+  LifeVariable,
+  DayDate,
+  NavigationTab,
+  SignInResult,
+  YearData,
+  YearDataMap
+} from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
 
@@ -23,21 +30,20 @@ interface StoreState {
   loading: boolean;
   init: () => void;
 
-  dataKeys: DataKey[];
-  addDataKey: (dataKeyLabel: string) => void;
-  deleteDataKey: (dataKeyId: string) => void;
+  navigationTab: NavigationTab;
+  setNavigationTab: (newTab: NavigationTab) => void;
+
+  lifeVariables: LifeVariable[];
+  addLifeVariable: (lifeVariableLabel: string) => void;
+  deleteLifeVariable: (lifeVariableId: string) => void;
 
   yearDataMap: YearDataMap;
   addDayData: (
-    dataKeyId: string,
+    lifeVariableId: string,
     dayDate: DayDate,
     value: boolean
   ) => Promise<void>;
   deleteDayData: (dayDataId: string) => void;
-
-  // TODO - can delete
-  leftScroll: number;
-  setLeftScroll: (leftScroll: number) => void;
 
   idToken: string | null;
   accessToken: string | null;
@@ -48,29 +54,43 @@ interface StoreState {
   signOut: () => void;
   linkAnonymousUser: () => void;
 
+  day: number;
   year: number;
   previousYear: () => void;
   nextYear: () => void;
   month: number;
   setMonth: (month: number) => void;
+  setDisplayDate: (dayDate: DayDate) => void;
 
   showLoginDialog: boolean;
   openLoginDialog: () => void;
   closeLoginDialog: () => void;
 
-  showAddDataKeyDialog: boolean;
-  openAddDataKeyDialog: () => void;
-  closeAddDataKeyDialog: () => void;
+  showAddLifeVariableDialog: boolean;
+  openAddLifeVariableDialog: () => void;
+  closeAddLifeVariableDialog: () => void;
 
   showDayDataDialog: boolean;
-  dayDataDialogProps: { dataKey: DataKey; dayDate: DayDate } | null;
-  openDayDataDialog: (dataKey: DataKey, dayDate: DayDate) => void;
+  dayDataDialogProps: { lifeVariable: LifeVariable; dayDate: DayDate } | null;
+  openDayDataDialog: (lifeVariable: LifeVariable, dayDate: DayDate) => void;
   closeDayDataDialog: () => void;
+
+  showStarRatingDialog: boolean;
+  openShowStarRatingDialog: () => void;
+  closeShowStarRatingDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
   loading: true,
-  dataKeys: [],
+
+  navigationTab: NavigationTab.TODAY,
+  setNavigationTab: (newTab: NavigationTab) => {
+    set((state) => ({
+      navigationTab: newTab,
+    }));
+  },
+
+  lifeVariables: [],
   yearDataMap: {},
   init: async () => {
     // Try to get the user back from local storage
@@ -104,13 +124,13 @@ const useStore = create<StoreState>()((set, get) => ({
       );
     }
 
-    let dataKeys: DataKey[] = [];
+    let lifeVariables: LifeVariable[] = [];
     let yearData: YearData = { true: {}, false: {} };
 
     if (user?.uid) {
       // If the user exists, fetch user data
       const userData = await fetchUserData(user.uid, get().year);
-      dataKeys = userData.dataKeys;
+      lifeVariables = userData.lifeVariables;
       yearData = userData.yearData;
     }
 
@@ -124,7 +144,7 @@ const useStore = create<StoreState>()((set, get) => ({
           isAnon: user != null && idToken == null && accessToken == null,
           idToken,
           accessToken,
-          dataKeys,
+          lifeVariables,
           yearDataMap: {
             [get().year]: yearData,
           },
@@ -132,21 +152,21 @@ const useStore = create<StoreState>()((set, get) => ({
     );
   },
 
-  addDataKey: async (dataKeyLabel: string) => {
-    const dataKey = await addDataKey(get().user!.uid, dataKeyLabel);
+  addLifeVariable: async (lifeVariableLabel: string) => {
+    const lifeVariable = await addLifeVariable(get().user!.uid, lifeVariableLabel);
 
     set((state) => ({
-      dataKeys: [...state.dataKeys, dataKey],
-      showAddDataKeyDialog: false,
+      lifeVariables: [lifeVariable, ...state.lifeVariables],
+      showAddLifeVariableDialog: false,
     }));
   },
-  deleteDataKey: async (dataKeyId: string) => {
-    await deleteDataKey(get().user!.uid, dataKeyId);
-    // TODO - update state.dataKeys
+  deleteLifeVariable: async (lifeVariableId: string) => {
+    await deleteLifeVariable(get().user!.uid, lifeVariableId);
+    // TODO - update state.lifeVariables
   },
 
-  addDayData: async (dataKeyId: string, dayDate: DayDate, value: boolean) => {
-    await addDayData(get().user!.uid, dataKeyId, dayDate, value);
+  addDayData: async (lifeVariableId: string, dayDate: DayDate, value: boolean) => {
+    await addDayData(get().user!.uid, lifeVariableId, dayDate, value);
     set((state) => ({
       yearDataMap: {
         ...state.yearDataMap,
@@ -155,15 +175,15 @@ const useStore = create<StoreState>()((set, get) => ({
 
           // Add the dateKey to the new value's map
           const newValueKey = `${value}`;
-          if (!draft[newValueKey][dataKeyId]) {
-            draft[newValueKey][dataKeyId] = new Set([]);
+          if (!draft[newValueKey][lifeVariableId]) {
+            draft[newValueKey][lifeVariableId] = new Set([]);
           }
-          draft[newValueKey][dataKeyId].add(dateKey);
+          draft[newValueKey][lifeVariableId].add(dateKey);
 
           // Remove the dateKey from the old value's map (if it exists)
           const oldValueKey = `${!value}`;
-          if (draft[oldValueKey][dataKeyId]) {
-            draft[oldValueKey][dataKeyId].delete(dateKey);
+          if (draft[oldValueKey][lifeVariableId]) {
+            draft[oldValueKey][lifeVariableId].delete(dateKey);
           }
         }),
       },
@@ -172,10 +192,6 @@ const useStore = create<StoreState>()((set, get) => ({
   deleteDayData: (dayDataId: string) => {
     // TODO - implement deleting from firebase
   },
-
-  leftScroll: 0,
-  setLeftScroll: (leftScroll: number) =>
-    set({ leftScroll } as Partial<StoreState>),
 
   idToken: null,
   accessToken: null,
@@ -224,14 +240,14 @@ const useStore = create<StoreState>()((set, get) => ({
       );
 
       // Then try to fetch user data
-      const { dataKeys, yearData } = await fetchUserData(
+      const { lifeVariables: lifeVariables, yearData } = await fetchUserData(
         result.userCredential.user.uid,
         get().year
       );
 
       set((state) => ({
         loading: false,
-        dataKeys,
+        lifeVariables,
         yearDataMap: {
           [get().year]: yearData,
         },
@@ -252,12 +268,12 @@ const useStore = create<StoreState>()((set, get) => ({
       (state) =>
         ({
           loading: false,
-          dataKeys: [] as DataKey[],
+          lifeVariables: [] as LifeVariable[],
           yearDataMap: {},
           year: moment().year(),
           month: moment().month(),
           showLoginDialog: false,
-          showAddDataKeyDialog: false,
+          showAddLifeVariableDialog: false,
           idToken: null,
           accessToken: null,
           user: null,
@@ -289,7 +305,7 @@ const useStore = create<StoreState>()((set, get) => ({
       );
     }
 
-    // TODO - update data from anon userId and update dataKey and dataMap
+    // TODO - update data from anon userId and update lifeVariable and dataMap
     set(
       (state) =>
         ({
@@ -301,6 +317,7 @@ const useStore = create<StoreState>()((set, get) => ({
     );
   },
 
+  day: moment().date(),
   year: moment().year(),
   previousYear: () => {
     // TODO - fetch data for new year
@@ -314,6 +331,9 @@ const useStore = create<StoreState>()((set, get) => ({
   setMonth: (month) => {
     set({ month });
   },
+  setDisplayDate({ year, month, day}: DayDate) {
+    set({ year, month, day });
+  },
 
   showLoginDialog: false,
   openLoginDialog: () =>
@@ -321,23 +341,28 @@ const useStore = create<StoreState>()((set, get) => ({
   closeLoginDialog: () =>
     set((state) => ({ showLoginDialog: false } as StoreState)),
 
-  showAddDataKeyDialog: false,
-  openAddDataKeyDialog: () =>
-    set((state) => ({ showAddDataKeyDialog: true } as StoreState)),
-  closeAddDataKeyDialog: () =>
-    set((state) => ({ showAddDataKeyDialog: false } as StoreState)),
+  showAddLifeVariableDialog: false,
+  openAddLifeVariableDialog: () =>
+    set((state) => ({ showAddLifeVariableDialog: true } as StoreState)),
+  closeAddLifeVariableDialog: () =>
+    set((state) => ({ showAddLifeVariableDialog: false } as StoreState)),
 
   showDayDataDialog: false,
   dayDataDialogProps: null,
-  openDayDataDialog: (dataKey: DataKey, dayDate: DayDate) => {
-    console.log("********** opening!!!!");
+  openDayDataDialog: (lifeVariable: LifeVariable, dayDate: DayDate) => {
     set(() => ({
       showDayDataDialog: true,
-      dayDataDialogProps: { dataKey, dayDate },
+      dayDataDialogProps: { lifeVariable, dayDate },
     }));
   },
   closeDayDataDialog: () =>
     set(() => ({ showDayDataDialog: false, dayDataDialogProps: null })),
+
+  showStarRatingDialog: false,
+  openShowStarRatingDialog: () => 
+    set((state) => ({ showStarRatingDialog: true } as StoreState)),
+  closeShowStarRatingDialog: () => 
+    set((state) => ({ showStarRatingDialog: false } as StoreState)),
 }));
 
 export default useStore;

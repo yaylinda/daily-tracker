@@ -1,72 +1,89 @@
-import FlakyIcon from "@mui/icons-material/Flaky";
 import { ThemeProvider } from "@emotion/react";
-import { AppBar, Avatar, Box, Toolbar, Typography } from "@mui/material";
+import TodayIcon from "@mui/icons-material/Today";
+import CodeIcon from "@mui/icons-material/Code";
+import {
+  BottomNavigation,
+  BottomNavigationAction,
+  Box,
+  LinearProgress,
+} from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
-import UserAvatar from "./components/UserAvatar";
-import AddDataKeyDialog from "./dialogs/AddDataKeyDialog";
+import AddLifeVariableDialog from "./dialogs/AddLifeVariableDialog";
 import LogInDialog from "./dialogs/LogInDialog";
-import MainPanel from "./layout/MainPanel";
-import Sidebar from "./layout/Sidebar";
+import useWindowDimensions from "./hooks/useWindowDimensions";
+import TodayPage from "./pages/TodayPage";
+import VariablesPage from "./pages/VariablesPage";
 import useStore from "./store";
 import theme from "./theme";
+import { NavigationTab } from "./types";
+import { FOOTER_HEIGHT } from "./utils/constants";
 
 function App() {
-  const { isAuthed, loading, init, openLoginDialog } = useStore();
+  const { isAuthed, loading, navigationTab, init, setNavigationTab } =
+    useStore();
+  const { width, height } = useWindowDimensions();
 
   React.useEffect(() => {
     init();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const renderHeader = () => {
-    return (
-      <AppBar
-        position="fixed"
-        sx={{
-          backgroundColor: theme.palette.background.default,
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-        }}
-      >
-        <Toolbar>
-          <Box>
-            {!loading && isAuthed && (
-              <Avatar>
-                <FlakyIcon />
-              </Avatar>
-            )}
-          </Box>
-          <Typography
-            variant="h4"
-            noWrap
-            sx={{ textAlign: "center", flexGrow: 1 }}
-          >
-            Life as Booleans
-          </Typography>
-          <Box>{!loading && isAuthed && <UserAvatar />}</Box>
-        </Toolbar>
-      </AppBar>
-    );
+  const renderContent = () => {
+    switch (navigationTab) {
+      case NavigationTab.TODAY:
+        return <TodayPage />;
+      case NavigationTab.VARIABLES:
+        return <VariablesPage />;
+    }
   };
 
-  const renderContent = () => {
-    if (!isAuthed && !loading) {
-      return <LoggedOutView />;
-    }
+  const renderFooter = () => {
     return (
-      <>
-        <Sidebar />
-        <MainPanel />
-      </>
+      <BottomNavigation
+        showLabels
+        value={navigationTab}
+        onChange={(_, newValue) => {
+          setNavigationTab(newValue);
+        }}
+      >
+        <BottomNavigationAction
+          value={NavigationTab.TODAY}
+          label={NavigationTab.TODAY}
+          icon={<TodayIcon />}
+        />
+        <BottomNavigationAction
+          value={NavigationTab.VARIABLES}
+          label={NavigationTab.VARIABLES}
+          icon={<CodeIcon />}
+        />
+      </BottomNavigation>
     );
   };
 
   return (
     <ThemeProvider theme={theme}>
-      {renderHeader()}
-      {renderContent()}
-      <LogInDialog />
-      <AddDataKeyDialog />
+      {loading ? (
+        <LinearProgress />
+      ) : isAuthed ? (
+        <>
+          <Box
+            sx={{
+              height: height - FOOTER_HEIGHT,
+              overflow: "hidden",
+            }}
+          >
+            {renderContent()}
+            <AddLifeVariableDialog />
+          </Box>
+          {renderFooter()}
+        </>
+      ) : (
+        <>
+          <LoggedOutView />
+          <LogInDialog />
+        </>
+      )}
     </ThemeProvider>
   );
 }

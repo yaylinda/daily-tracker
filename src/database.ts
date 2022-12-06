@@ -6,13 +6,21 @@ import {
   getFirestore,
   orderBy,
   query,
-  serverTimestamp,
   setDoc,
   updateDoc,
 } from "firebase/firestore";
+import moment from "moment";
 import app from "./firebase";
-import { DataKey, DayData, DayDate, UserData, YearData } from "./types";
-import { getDateKey } from "./utils/dateUtil";
+import {
+  DayData,
+  DayDate,
+  LifeVariable,
+  StarRating,
+  StarRatingDateMap,
+  UserData,
+  YearData,
+} from "./types";
+import { getDateKey, getDayDateFromMoment } from "./utils/dateUtil";
 
 // The firestore db object
 const db = getFirestore(app);
@@ -30,17 +38,18 @@ export const fetchUserData = async (
   userId: string,
   year: number
 ): Promise<UserData> => {
-  const dataKeys = await getDataKeys(userId);
+  const lifeVariables = await getLifeVariables(userId);
   const yearData = await getYearData(userId, year);
-  return { dataKeys, yearData };
+  const starRatings = await getStarRatings(userId, year);
+  return { lifeVariables, yearData, starRatings };
 };
 
 /**************************************
  * DATA KEYS
  **************************************/
 
-function getDataKeyCollection(userId: string) {
-  return collection(db, `${userId}_data_keys`);
+function getLifeVariableCollection(userId: string) {
+  return collection(db, `${userId}_life_variables`);
 }
 
 /**
@@ -48,53 +57,62 @@ function getDataKeyCollection(userId: string) {
  * @param userId
  * @returns
  */
-export const getDataKeys = async (userId: string): Promise<DataKey[]> => {
-  const dataKeysQuerySnapshot = await getDocs(
-    query(getDataKeyCollection(userId), orderBy("createdAt"))
+export const getLifeVariables = async (
+  userId: string
+): Promise<LifeVariable[]> => {
+  const querySnapshot = await getDocs(
+    query(getLifeVariableCollection(userId), orderBy("createdAt"))
   );
 
-  const dataKeys: DataKey[] = [];
-  dataKeysQuerySnapshot.forEach((doc) => {
-    dataKeys.push({
-      ...(doc.data() as Omit<DataKey, "id">),
+  const lifeVariables: LifeVariable[] = [];
+
+  querySnapshot.forEach((doc) => {
+    lifeVariables.push({
+      ...(doc.data() as Omit<LifeVariable, "id">),
       id: doc.id,
     });
   });
 
-  return dataKeys;
+  return lifeVariables;
 };
 
 /**
  *
  * @param userId
- * @param dataKeyLabel
+ * @param lifeVariableLabel
  * @returns
  */
-export const addDataKey = async (
+export const addLifeVariable = async (
   userId: string,
-  dataKeyLabel: string
-): Promise<DataKey> => {
-  const inputDataKey: Omit<DataKey, "id"> = {
-    label: dataKeyLabel,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+  lifeVariableLabel: string
+): Promise<LifeVariable> => {
+  const inputLifeVariable: Omit<LifeVariable, "id"> = {
+    label: lifeVariableLabel,
+    createdAt: getDayDateFromMoment(moment()),
+    updatedAt: getDayDateFromMoment(moment()),
     deletedAt: null,
   };
-  const newDataKey = await addDoc(getDataKeyCollection(userId), inputDataKey);
+  const newLifeVariable = await addDoc(
+    getLifeVariableCollection(userId),
+    inputLifeVariable
+  );
   return {
-    ...inputDataKey,
-    id: newDataKey.id,
+    ...inputLifeVariable,
+    id: newLifeVariable.id,
   };
 };
 
 /**
  *
- * @param dataKeyId
+ * @param lifeVariableId
  * @returns
  */
-export const deleteDataKey = async (userId: string, dataKeyId: string) => {
-  const docRef = doc(getDataKeyCollection(userId), dataKeyId);
-  return await updateDoc(docRef, { deletedAt: serverTimestamp() });
+export const deleteLifeVariable = async (
+  userId: string,
+  lifeVariableId: string
+) => {
+  const docRef = doc(getLifeVariableCollection(userId), lifeVariableId);
+  return await updateDoc(docRef, { deletedAt: getDayDateFromMoment(moment()) });
 };
 
 /**************************************
@@ -128,10 +146,10 @@ export const getYearData = async (
       if (curr.value == null) {
         return prev;
       }
-      if (!prev[`${curr.value}`][curr.dataKeyId]) {
-        prev[`${curr.value}`][curr.dataKeyId] = new Set([]);
+      if (!prev[`${curr.value}`][curr.lifeVariableId]) {
+        prev[`${curr.value}`][curr.lifeVariableId] = new Set([]);
       }
-      prev[`${curr.value}`][curr.dataKeyId].add(curr.dateKey);
+      prev[`${curr.value}`][curr.lifeVariableId].add(curr.dateKey);
       return prev;
     },
     { true: {}, false: {} } as YearData
@@ -141,29 +159,81 @@ export const getYearData = async (
 /**
  *
  * @param userId
- * @param dataKeyId
+ * @param lifeVariableId
  * @param dayDate
  * @returns
  */
 export const addDayData = async (
   userId: string,
-  dataKeyId: string,
+  lifeVariableId: string,
   dayDate: DayDate,
   value: boolean
 ) => {
   const dateKey = getDateKey(dayDate);
   const docRef = doc(
     getUserDayDataCollection(userId, dayDate.year),
-    `${dataKeyId}_${dateKey}`
+    `${lifeVariableId}_${dateKey}`
   );
   const dayData: DayData = {
     ...dayDate,
-    dataKeyId,
+    lifeVariableId,
     value,
     dateKey,
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp(),
+    createdAt: getDayDateFromMoment(moment()),
+    updatedAt: getDayDateFromMoment(moment()),
     deletedAt: null,
   };
   await setDoc(docRef, dayData);
+};
+
+/**************************************
+ * DAY STAR RATINGS
+ **************************************/
+
+function getUserStarRatingsCollection(userId: string, year: number) {
+  return collection(db, `${userId}_${year}_stars`);
+}
+
+/**
+ *
+ * @param userId
+ * @param year
+ * @returns
+ */
+export const getStarRatings = async (
+  userId: string,
+  year: number
+): Promise<StarRatingDateMap> => {
+  const starQuerySnapshot = await getDocs(
+    getUserStarRatingsCollection(userId, year)
+  );
+
+  const starData: StarRating[] = [];
+  starQuerySnapshot.forEach((doc) => {
+    starData.push(doc.data() as StarRating);
+  });
+
+  return starData.reduce((prev, curr) => {
+    prev[curr.dateKey] = prev[curr.rating];
+    return prev;
+  }, {} as StarRatingDateMap);
+};
+
+/**
+ *
+ * @param userId
+ * @param dayDate
+ * @param rating
+ */
+export const setStarRating = async (
+  userId: string,
+  dayDate: DayDate,
+  rating: number
+) => {
+  const dateKey = getDateKey(dayDate);
+  const docRef = doc(
+    getUserStarRatingsCollection(userId, dayDate.year),
+    dateKey
+  );
+  await setDoc(docRef, { dateKey, rating });
 };

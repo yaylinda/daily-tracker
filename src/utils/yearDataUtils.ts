@@ -3,11 +3,11 @@ import { getDateKey } from "./dateUtil";
 
 export const getDayData = (
   yearData: YearData,
-  dataKeyId: string,
+  lifeVariableId: string,
   dayDate: DayDate
 ): { isTrue: boolean; isFalse: boolean } => {
-  const trueDates = yearData?.[`${true}`][dataKeyId] || new Set([]);
-  const falseDates = yearData?.[`${false}`][dataKeyId] || new Set([]);
+  const trueDates = yearData?.[`${true}`][lifeVariableId] || new Set([]);
+  const falseDates = yearData?.[`${false}`][lifeVariableId] || new Set([]);
   const dateKey = getDateKey(dayDate);
 
   return {
