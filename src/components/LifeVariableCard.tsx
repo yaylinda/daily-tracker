@@ -12,25 +12,25 @@ import {
 import moment from "moment";
 import { useState } from "react";
 import useStore from "../store";
-import { DataKey } from "../types";
+import { LifeVariable } from "../types";
 import { stringToColor } from "../utils/colorUtil";
 import YearGrid from "./YearGrid";
 
-const VariableCard = ({ dataKey }: { dataKey: DataKey }) => {
+const LifeVariableCard = ({ lifeVariable }: { lifeVariable: LifeVariable }) => {
   const { yearDataMap } = useStore();
 
   const [expanded, setExpanded] = useState(false);
 
-  const color = stringToColor(dataKey.id);
+  const color = stringToColor(lifeVariable.id);
 
   const numDaysSinceCreated =
-    moment().diff(moment(dataKey.createdAt, "X"), "day") + 1;
+    moment().diff(moment(lifeVariable.createdAt, "X"), "day") + 1;
 
   const completedDays = Object.keys(yearDataMap).reduce(
     (prev: Set<string>, curr: string) =>
       new Set([
         ...prev,
-        ...(yearDataMap[parseInt(curr)]["true"][dataKey.id] || new Set([])),
+        ...(yearDataMap[parseInt(curr)]["true"][lifeVariable.id] || new Set([])),
       ]),
     new Set([])
   );
@@ -44,7 +44,7 @@ const VariableCard = ({ dataKey }: { dataKey: DataKey }) => {
     >
       <CardHeader
         avatar={<Avatar sx={{ backgroundColor: color }}> </Avatar>}
-        title={dataKey.label}
+        title={lifeVariable.label}
         subheader={`Completed ${
           completedDays.size
         } of ${numDaysSinceCreated} days (${completionPercentage.toFixed(1)}%)`}
@@ -57,7 +57,7 @@ const VariableCard = ({ dataKey }: { dataKey: DataKey }) => {
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
           {Object.keys(yearDataMap).map((year) => (
-            <YearGrid key={year} year={parseInt(year)} dataKey={dataKey} />
+            <YearGrid key={year} year={parseInt(year)} lifeVariable={lifeVariable} />
           ))}
         </CardContent>
       </Collapse>
@@ -70,4 +70,4 @@ const VariableCard = ({ dataKey }: { dataKey: DataKey }) => {
   );
 };
 
-export default VariableCard;
+export default LifeVariableCard;

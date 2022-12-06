@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import app from "./firebase";
 import {
-  DataKey,
+  LifeVariable,
   DayData,
   DayDate,
   StarRating,
@@ -39,18 +39,18 @@ export const fetchUserData = async (
   userId: string,
   year: number
 ): Promise<UserData> => {
-  const dataKeys = await getDataKeys(userId);
+  const lifeVariables = await getLifeVariables(userId);
   const yearData = await getYearData(userId, year);
   const starRatings = await getStarRatings(userId, year);
-  return { dataKeys, yearData, starRatings};
+  return { lifeVariables, yearData, starRatings};
 };
 
 /**************************************
  * DATA KEYS
  **************************************/
 
-function getDataKeyCollection(userId: string) {
-  return collection(db, `${userId}_data_keys`);
+function getLifeVariableCollection(userId: string) {
+  return collection(db, `${userId}_life_variables`);
 }
 
 /**
@@ -58,52 +58,53 @@ function getDataKeyCollection(userId: string) {
  * @param userId
  * @returns
  */
-export const getDataKeys = async (userId: string): Promise<DataKey[]> => {
-  const dataKeysQuerySnapshot = await getDocs(
-    query(getDataKeyCollection(userId), orderBy("createdAt"))
+export const getLifeVariables = async (userId: string): Promise<LifeVariable[]> => {
+  const querySnapshot = await getDocs(
+    query(getLifeVariableCollection(userId), orderBy("createdAt"))
   );
 
-  const dataKeys: DataKey[] = [];
-  dataKeysQuerySnapshot.forEach((doc) => {
-    dataKeys.push({
-      ...(doc.data() as Omit<DataKey, "id">),
+  const lifeVariables: LifeVariable[] = [];
+  
+  querySnapshot.forEach((doc) => {
+    lifeVariables.push({
+      ...(doc.data() as Omit<LifeVariable, "id">),
       id: doc.id,
     });
   });
 
-  return dataKeys;
+  return lifeVariables;
 };
 
 /**
  *
  * @param userId
- * @param dataKeyLabel
+ * @param lifeVariableLabel
  * @returns
  */
-export const addDataKey = async (
+export const addLifeVariable = async (
   userId: string,
-  dataKeyLabel: string
-): Promise<DataKey> => {
-  const inputDataKey: Omit<DataKey, "id"> = {
-    label: dataKeyLabel,
+  lifeVariableLabel: string
+): Promise<LifeVariable> => {
+  const inputLifeVariable: Omit<LifeVariable, "id"> = {
+    label: lifeVariableLabel,
     createdAt: Timestamp.now().seconds,
     updatedAt: Timestamp.now().seconds,
     deletedAt: null,
   };
-  const newDataKey = await addDoc(getDataKeyCollection(userId), inputDataKey);
+  const newLifeVariable = await addDoc(getLifeVariableCollection(userId), inputLifeVariable);
   return {
-    ...inputDataKey,
-    id: newDataKey.id,
+    ...inputLifeVariable,
+    id: newLifeVariable.id,
   };
 };
 
 /**
  *
- * @param dataKeyId
+ * @param lifeVariableId
  * @returns
  */
-export const deleteDataKey = async (userId: string, dataKeyId: string) => {
-  const docRef = doc(getDataKeyCollection(userId), dataKeyId);
+export const deleteLifeVariable = async (userId: string, lifeVariableId: string) => {
+  const docRef = doc(getLifeVariableCollection(userId), lifeVariableId);
   return await updateDoc(docRef, { deletedAt: serverTimestamp() });
 };
 
@@ -138,10 +139,10 @@ export const getYearData = async (
       if (curr.value == null) {
         return prev;
       }
-      if (!prev[`${curr.value}`][curr.dataKeyId]) {
-        prev[`${curr.value}`][curr.dataKeyId] = new Set([]);
+      if (!prev[`${curr.value}`][curr.lifeVariableId]) {
+        prev[`${curr.value}`][curr.lifeVariableId] = new Set([]);
       }
-      prev[`${curr.value}`][curr.dataKeyId].add(curr.dateKey);
+      prev[`${curr.value}`][curr.lifeVariableId].add(curr.dateKey);
       return prev;
     },
     { true: {}, false: {} } as YearData
@@ -151,24 +152,24 @@ export const getYearData = async (
 /**
  *
  * @param userId
- * @param dataKeyId
+ * @param lifeVariableId
  * @param dayDate
  * @returns
  */
 export const addDayData = async (
   userId: string,
-  dataKeyId: string,
+  lifeVariableId: string,
   dayDate: DayDate,
   value: boolean
 ) => {
   const dateKey = getDateKey(dayDate);
   const docRef = doc(
     getUserDayDataCollection(userId, dayDate.year),
-    `${dataKeyId}_${dateKey}`
+    `${lifeVariableId}_${dateKey}`
   );
   const dayData: DayData = {
     ...dayDate,
-    dataKeyId,
+    lifeVariableId,
     value,
     dateKey,
     createdAt: Timestamp.now().seconds,

@@ -23,7 +23,7 @@ import { useMemo } from "react";
 import DayDataChip from "../components/DayDataChip";
 import useStore from "../store";
 import theme from "../theme";
-import { DataKey } from "../types";
+import { LifeVariable } from "../types";
 import {
   getDateKey,
   getDayDateFromMoment,
@@ -35,7 +35,7 @@ import {
 const NUM_CHIPS_PER_ROW = 2;
 
 const AddLifeVariableChip = () => {
-  const { openAddDataKeyDialog } = useStore();
+  const { openAddLifeVariableDialog } = useStore();
 
   return (
     <Chip
@@ -46,7 +46,7 @@ const AddLifeVariableChip = () => {
         color: theme.palette.text.secondary,
       }}
       label="Add Life Variable"
-      onClick={openAddDataKeyDialog}
+      onClick={openAddLifeVariableDialog}
       avatar={
         <Avatar sx={{ background: "none" }}>
           <AddIcon sx={{ color: theme.palette.text.secondary }} />
@@ -63,9 +63,9 @@ const TodayPage = () => {
     year,
     month,
     day,
-    dataKeys,
+    lifeVariables,
     yearDataMap,
-    openAddDataKeyDialog,
+    openAddLifeVariableDialog,
     setDisplayDate,
   } = useStore();
 
@@ -80,15 +80,15 @@ const TodayPage = () => {
   }, [year, month, day, yearDataMap]);
 
   // The variables that were created on or before this day, that are available for tracking
-  const dataKeysToShow = useMemo(
+  const lifeVariablesToShow = useMemo(
     () =>
-      dataKeys.filter((dataKey) =>
-        moment(dataKey.createdAt, "X").isSameOrBefore(
+      lifeVariables.filter((lifeVariable) =>
+        moment(lifeVariable.createdAt, "X").isSameOrBefore(
           getMomentFromDayDate({ year, month, day }),
           "day"
         )
       ),
-    [year, month, day, dataKeys]
+    [year, month, day, lifeVariables]
   );
 
   const nextDay = () =>
@@ -133,7 +133,7 @@ const TodayPage = () => {
               </Avatar>
             }
             title={currentDayLabel()}
-            subheader={`Completed: ${numCompleted} out of ${dataKeysToShow.length}`}
+            subheader={`Completed: ${numCompleted} out of ${lifeVariablesToShow.length}`}
           />
           <CardContent
             sx={{
@@ -142,9 +142,9 @@ const TodayPage = () => {
               gap: 2,
             }}
           >
-            {isEmpty(dataKeysToShow) &&
+            {isEmpty(lifeVariablesToShow) &&
               (isToday({ year, month, day }) ? (
-                <Button onClick={openAddDataKeyDialog}>
+                <Button onClick={openAddLifeVariableDialog}>
                   Add Life Variables to track
                 </Button>
               ) : (
@@ -158,7 +158,7 @@ const TodayPage = () => {
                   No data
                 </Typography>
               ))}
-            {chunk([...dataKeysToShow, {}], NUM_CHIPS_PER_ROW).map((chips, row_num) => (
+            {chunk([...lifeVariablesToShow, {}], NUM_CHIPS_PER_ROW).map((chips, row_num) => (
               <Box
                 key={`row_${row_num}`}
                 sx={{
@@ -168,13 +168,13 @@ const TodayPage = () => {
                   gap: 2,
                 }}
               >
-                {chips.map((dataKey, index) =>
-                  isEmpty(dataKey) ? (
+                {chips.map((lifeVariable, index) =>
+                  isEmpty(lifeVariable) ? (
                     isToday({ year, month, day }) && <AddLifeVariableChip key={`add_chip`}/>
                   ) : (
                     <DayDataChip
-                      key={`chip_${(dataKey as DataKey).id}`}
-                      dataKey={dataKey as DataKey}
+                      key={`chip_${(lifeVariable as LifeVariable).id}`}
+                      lifeVariable={lifeVariable as LifeVariable}
                       tooltipPlacement={index ? "right" : "left"}
                       isToday={isToday({ year, month, day })}
                     />

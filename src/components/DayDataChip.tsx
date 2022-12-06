@@ -3,17 +3,17 @@ import moment from "moment";
 import { useState } from "react";
 import useStore from "../store";
 import theme from "../theme";
-import { DataKey } from "../types";
+import { LifeVariable } from "../types";
 import { stringToColor } from "../utils/colorUtil";
 import { getMomentFromDayDate } from "../utils/dateUtil";
 import { getDayData } from "../utils/yearDataUtils";
 
 const DayDataChip = ({
-  dataKey,
+  lifeVariable,
   tooltipPlacement,
   isToday,
 }: {
-  dataKey: DataKey;
+  lifeVariable: LifeVariable;
   tooltipPlacement: "left" | "right";
   isToday: boolean;
 }) => {
@@ -21,21 +21,21 @@ const DayDataChip = ({
 
   const { year, month, day, yearDataMap, addDayData } = useStore();
 
-  const dataBooleans = getDayData(yearDataMap[year], dataKey.id, {
+  const dataBooleans = getDayData(yearDataMap[year], lifeVariable.id, {
     year,
     month,
     day,
   });
   const { isTrue, isFalse } = dataBooleans;
 
-  const color = stringToColor(dataKey.id);
+  const color = stringToColor(lifeVariable.id);
 
   const updateData = () => {
     if (saving) {
       return;
     }
     setSaving(true);
-    addDayData(dataKey.id, { year, month, day }, isTrue ? false : true).then(
+    addDayData(lifeVariable.id, { year, month, day }, isTrue ? false : true).then(
       () => {
         setSaving(false);
       }
@@ -78,7 +78,7 @@ const DayDataChip = ({
             </Avatar>
           )
         }
-        label={dataKey.label}
+        label={lifeVariable.label}
         variant={isTrue ? undefined : "outlined"}
         onClick={() => isToday ? updateData() : undefined}
         clickable={isToday}

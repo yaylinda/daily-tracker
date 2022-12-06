@@ -23,17 +23,17 @@ export interface DayInMonth extends DayDate {
 }
 
 export interface DayData extends DayDate, Auditable {
-  dataKeyId: string;
+  lifeVariableId: string;
   value: boolean;
   dateKey: string;
 }
 
-export interface DataKey extends Auditable {
+export interface LifeVariable extends Auditable {
   id: string;
   label: string;
 }
 
-export type DataKeyDateMap = { [dataKeyId in string]: Set<string> };
+export type LifeVariableDateMap = { [lifeVariableId in string]: Set<string> };
 
 /**
  * Example:
@@ -47,7 +47,7 @@ export type DataKeyDateMap = { [dataKeyId in string]: Set<string> };
  * }
  */
 export type YearData = {
-  [valueStr in string]: DataKeyDateMap;
+  [valueStr in string]: LifeVariableDateMap;
 };
 
 export type YearDataMap = {
@@ -68,7 +68,7 @@ export type YearStarRatingMap = {
 };
 
 export interface UserData {
-  dataKeys: DataKey[];
+  lifeVariables: LifeVariable[];
   yearData: YearData;
   starRatings: StarRatingDateMap;
 }
@@ -76,5 +76,4 @@ export interface UserData {
 export enum NavigationTab {
   TODAY = "Today",
   VARIABLES = "Variables",
-  STATS = "Stats",
 }

@@ -4,49 +4,49 @@ import useStore from "../store";
 import DialogActionButtons from "./DialogActionButtons";
 import DialogTransition from "./DialogTransition";
 
-const AddVariableDialog = () => {
-  const { showAddDataKeyDialog, closeAddDataKeyDialog, addDataKey } =
+const AddLifeVariableDialog = () => {
+  const { showAddLifeVariableDialog, closeAddLifeVariableDialog, addLifeVariable } =
     useStore();
 
-  const [dataKeyLabel, setDataKeyLabel] = React.useState<string>("");
+  const [lifeVariableLabel, setLifeVariableLabel] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
 
   React.useEffect(() => {
-    if (showAddDataKeyDialog) {
+    if (showAddLifeVariableDialog) {
       setLoading(false);
-      setDataKeyLabel("");
+      setLifeVariableLabel("");
     }
-  }, [showAddDataKeyDialog]);
+  }, [showAddLifeVariableDialog]);
 
   const submit = () => {
     setLoading(true);
-    addDataKey(dataKeyLabel);
+    addLifeVariable(lifeVariableLabel);
   };
 
   const onClose = () => {
-    setDataKeyLabel("");
+    setLifeVariableLabel("");
     setLoading(false);
-    closeAddDataKeyDialog();
+    closeAddLifeVariableDialog();
   };
 
   return (
     <Dialog
       onClose={onClose}
-      open={showAddDataKeyDialog}
+      open={showAddLifeVariableDialog}
       TransitionComponent={DialogTransition}
     >
       <DialogTitle>New Life Variable</DialogTitle>
       <DialogContent>
         <TextField
           variant="standard"
-          value={dataKeyLabel}
-          onChange={(event) => setDataKeyLabel(event.target.value)}
+          value={lifeVariableLabel}
+          onChange={(event) => setLifeVariableLabel(event.target.value)}
         />
       </DialogContent>
       <DialogActionButtons
         withLoading
         loading={loading}
-        confirmDisabled={!dataKeyLabel}
+        confirmDisabled={!lifeVariableLabel}
         onCancelClick={onClose}
         onConfirmClick={submit}
       />
@@ -54,4 +54,4 @@ const AddVariableDialog = () => {
   );
 };
 
-export default AddVariableDialog;
+export default AddLifeVariableDialog;

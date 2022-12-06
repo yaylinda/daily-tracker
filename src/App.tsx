@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import React from "react";
 import LoggedOutView from "./components/LoggedOutView";
-import AddVariableDialog from "./dialogs/AddVariableDialog";
+import AddLifeVariableDialog from "./dialogs/AddLifeVariableDialog";
 import LogInDialog from "./dialogs/LogInDialog";
 import useWindowDimensions from "./hooks/useWindowDimensions";
 import TodayPage from "./pages/TodayPage";
@@ -74,7 +74,7 @@ function App() {
             }}
           >
             {renderContent()}
-            <AddVariableDialog />
+            <AddLifeVariableDialog />
           </Box>
           {renderFooter()}
         </>

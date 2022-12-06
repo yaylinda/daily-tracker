@@ -1,6 +1,6 @@
 import { Box, Stack, Tooltip } from "@mui/material";
 import { useMemo } from "react";
-import { DataKey, DayDate } from "../types";
+import { LifeVariable, DayDate } from "../types";
 import {
   getDateKey,
   getMomentFromDayDate,
@@ -15,16 +15,16 @@ const CELL_BORDER = 0.5;
 
 interface YearGridDayCellProps {
   dayDate: DayDate;
-  dataKey: DataKey;
+  lifeVariable: LifeVariable;
 }
 
-const YearGridDayCell = ({ dayDate, dataKey }: YearGridDayCellProps) => {
+const YearGridDayCell = ({ dayDate, lifeVariable }: YearGridDayCellProps) => {
   const { yearDataMap } = useStore();
 
   const cellSize =
     dayDate.year === -1 ? CELL_SIZE + 2 * CELL_BORDER : CELL_SIZE;
 
-  const created = moment(dataKey.createdAt, "X").isSameOrBefore(
+  const created = moment(lifeVariable.createdAt, "X").isSameOrBefore(
     getMomentFromDayDate({ ...dayDate }),
     "day"
   );
@@ -43,8 +43,8 @@ const YearGridDayCell = ({ dayDate, dataKey }: YearGridDayCellProps) => {
     dayDate.year === -1 ? "none" : `${CELL_BORDER}px ${borderColor} solid`;
 
   const completedDays =
-    yearDataMap[dayDate.year]?.["true"]?.[dataKey.id] || new Set([]);
-    
+    yearDataMap[dayDate.year]?.["true"]?.[lifeVariable.id] || new Set([]);
+
   const completed = completedDays.has(getDateKey(dayDate));
 
   return (
@@ -64,10 +64,10 @@ const YearGridDayCell = ({ dayDate, dataKey }: YearGridDayCellProps) => {
 
 interface YearGridProps {
   year: number;
-  dataKey: DataKey;
+  lifeVariable: LifeVariable;
 }
 
-const YearGrid = ({ year, dataKey }: YearGridProps) => {
+const YearGrid = ({ year, lifeVariable }: YearGridProps) => {
   const weeks = useMemo(() => getWeekChunksForYearGrid(year), [year]);
 
   return (
@@ -75,7 +75,7 @@ const YearGrid = ({ year, dataKey }: YearGridProps) => {
       {weeks.map((week, week_num) => (
         <Stack key={`week_${week_num}`} sx={{ display: "flex", flexDirection: "column", gap: "3px" }}>
           {week.map((dayDate, day_num) => (
-            <YearGridDayCell key={`week_${week_num}_day_${day_num}`} dayDate={dayDate} dataKey={dataKey} />
+            <YearGridDayCell key={`week_${week_num}_day_${day_num}`} dayDate={dayDate} lifeVariable={lifeVariable} />
           ))}
         </Stack>
       ))}
