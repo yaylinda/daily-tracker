@@ -8,7 +8,7 @@ import {
   LinearProgress,
 } from "@mui/material";
 import React from "react";
-import LoggedOutView from "./components/LoggedOutView";
+import LoggedOutPage from "./pages/LoggedOutPage";
 import AddLifeVariableDialog from "./dialogs/AddLifeVariableDialog";
 import LogInDialog from "./dialogs/LogInDialog";
 import useWindowDimensions from "./hooks/useWindowDimensions";
@@ -80,7 +80,7 @@ function App() {
         </>
       ) : (
         <>
-          <LoggedOutView />
+          <LoggedOutPage />
           <LogInDialog />
         </>
       )}
