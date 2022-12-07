@@ -17,6 +17,7 @@ const VariablesPage = () => {
         margin: "auto",
         overflow: "hidden",
         height: "100%",
+        paddingTop: 4,
         '&::-webkit-scrollbar': {
           background: 'transparent', 
           display: 'none',
@@ -30,7 +31,6 @@ const VariablesPage = () => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          marginTop: 4,
           marginBottom: 2,
         }}
       >

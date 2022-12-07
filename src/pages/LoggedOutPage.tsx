@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Toolbar, Typography } from "@mui/material";
+import { Button, Stack, Toolbar, Typography } from "@mui/material";
 import useStore from "../store";
 import theme from "../theme";
 
@@ -20,29 +20,31 @@ const LoggedOutPage = () => {
     >
       <Toolbar />
       <Stack>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           Track
         </Typography>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           and
         </Typography>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           visualize
         </Typography>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           your
         </Typography>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           life
         </Typography>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           in
         </Typography>
-        <Typography variant="h2" sx={{ textAlign: "center" }}>
+        <Typography variant="h3" sx={{ textAlign: "center" }}>
           booleans
         </Typography>
       </Stack>
-      <Button variant="outlined" onClick={openLoginDialog}>get started</Button>
+      <Button variant="outlined" onClick={openLoginDialog}>
+        get started
+      </Button>
     </Stack>
   );
 };

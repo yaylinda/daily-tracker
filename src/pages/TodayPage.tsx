@@ -108,7 +108,7 @@ const TodayPage = () => {
     <Stack
       sx={{
         color: theme.palette.text.primary,
-        width: 500,
+        maxWidth: 500,
         margin: "auto",
         height: "100%",
       }}

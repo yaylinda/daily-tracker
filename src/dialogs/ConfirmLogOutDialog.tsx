@@ -3,31 +3,27 @@ import useStore from "../store";
 import DialogActionButtons from "./DialogActionButtons";
 import DialogTransition from "./DialogTransition";
 
-interface ConfirmLogOutDialogProps {
-  open: boolean;
-  onClose: () => void;
-}
-
-const ConfirmLogOutDialog = ({ open, onClose }: ConfirmLogOutDialogProps) => {
-  const { isAnon, signOut } = useStore();
+const ConfirmLogOutDialog = () => {
+  const { showConfirmLogoutDialog, signOut, closeConfirmLogoutDialog } =
+    useStore();
 
   return (
     <Dialog
-      open={open}
-      onClose={onClose}
+      open={showConfirmLogoutDialog}
+      onClose={closeConfirmLogoutDialog}
       TransitionComponent={DialogTransition}
     >
       <DialogTitle>Logout</DialogTitle>
       <DialogContent>
-        {isAnon && (
-          <Typography>
-            As an Anonymous User, you will not be able to recover your data if
-            you log out without linking your Google Account
-          </Typography>
-        )}
-        <Typography>Are you sure you want to log out?</Typography>
+        <Typography variant="body2">Are you sure you want to log out?</Typography>
       </DialogContent>
-      <DialogActionButtons onCancelClick={onClose} onConfirmClick={signOut} />
+      <DialogActionButtons
+        onCancelClick={closeConfirmLogoutDialog}
+        onConfirmClick={() => {
+          closeConfirmLogoutDialog();
+          signOut();
+        }}
+      />
     </Dialog>
   );
 };

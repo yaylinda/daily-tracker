@@ -18,6 +18,10 @@ import useStore from "./store";
 import theme from "./theme";
 import { NavigationTab } from "./types";
 import { FOOTER_HEIGHT } from "./utils/constants";
+import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsPage from "./pages/SettingsPage";
+import ConfirmLogOutDialog from "./dialogs/ConfirmLogOutDialog";
+import ConfirmClearDataDialog from "./dialogs/ConfirmClearDataDialog";
 
 function App() {
   const { isAuthed, loading, navigationTab, init, setNavigationTab } =
@@ -35,6 +39,8 @@ function App() {
         return <TodayPage />;
       case NavigationTab.VARIABLES:
         return <VariablesPage />;
+      case NavigationTab.SETTINGS:
+        return <SettingsPage />;
     }
   };
 
@@ -57,6 +63,11 @@ function App() {
           label={NavigationTab.VARIABLES}
           icon={<CodeIcon />}
         />
+        <BottomNavigationAction
+          value={NavigationTab.SETTINGS}
+          label={NavigationTab.SETTINGS}
+          icon={<SettingsIcon />}
+        />
       </BottomNavigation>
     );
   };
@@ -75,6 +86,8 @@ function App() {
           >
             {renderContent()}
             <AddLifeVariableDialog />
+            <ConfirmLogOutDialog />
+            <ConfirmClearDataDialog />
           </Box>
           {renderFooter()}
         </>

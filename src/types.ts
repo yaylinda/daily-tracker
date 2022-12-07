@@ -71,4 +71,5 @@ export interface UserData {
 export enum NavigationTab {
   TODAY = "Today",
   VARIABLES = "Variables",
+  SETTINGS = "Settings",
 }

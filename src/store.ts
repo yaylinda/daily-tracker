@@ -6,13 +6,13 @@ import {
   getOAuthCredentialFromTokens,
   signInAnon,
   signInWithGoogle,
-  signOutAsync
+  signOutAsync,
 } from "./auth";
 import {
   addLifeVariable,
   addDayData,
   deleteLifeVariable,
-  fetchUserData
+  fetchUserData,
 } from "./database";
 import {
   LifeVariable,
@@ -20,7 +20,7 @@ import {
   NavigationTab,
   SignInResult,
   YearData,
-  YearDataMap
+  YearDataMap,
 } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
 import { getDateKey } from "./utils/dateUtil";
@@ -44,6 +44,7 @@ interface StoreState {
     value: boolean
   ) => Promise<void>;
   deleteDayData: (dayDataId: string) => void;
+  clearData: () => void;
 
   idToken: string | null;
   accessToken: string | null;
@@ -78,6 +79,14 @@ interface StoreState {
   showStarRatingDialog: boolean;
   openShowStarRatingDialog: () => void;
   closeShowStarRatingDialog: () => void;
+
+  showConfirmLogoutDialog: boolean;
+  openConfirmLogoutDialog: () => void;
+  closeConfirmLogoutDialog: () => void;
+
+  showConfirmClearDataDialog: boolean;
+  openConfirmClearDataDialog: () => void;
+  closeConfirmClearDataDialog: () => void;
 }
 
 const useStore = create<StoreState>()((set, get) => ({
@@ -153,7 +162,10 @@ const useStore = create<StoreState>()((set, get) => ({
   },
 
   addLifeVariable: async (lifeVariableLabel: string) => {
-    const lifeVariable = await addLifeVariable(get().user!.uid, lifeVariableLabel);
+    const lifeVariable = await addLifeVariable(
+      get().user!.uid,
+      lifeVariableLabel
+    );
 
     set((state) => ({
       lifeVariables: [lifeVariable, ...state.lifeVariables],
@@ -165,7 +177,11 @@ const useStore = create<StoreState>()((set, get) => ({
     // TODO - update state.lifeVariables
   },
 
-  addDayData: async (lifeVariableId: string, dayDate: DayDate, value: boolean) => {
+  addDayData: async (
+    lifeVariableId: string,
+    dayDate: DayDate,
+    value: boolean
+  ) => {
     await addDayData(get().user!.uid, lifeVariableId, dayDate, value);
     set((state) => ({
       yearDataMap: {
@@ -191,6 +207,9 @@ const useStore = create<StoreState>()((set, get) => ({
   },
   deleteDayData: (dayDataId: string) => {
     // TODO - implement deleting from firebase
+  },
+  clearData: () => {
+
   },
 
   idToken: null,
@@ -251,6 +270,7 @@ const useStore = create<StoreState>()((set, get) => ({
         yearDataMap: {
           [get().year]: yearData,
         },
+        navigationTab: NavigationTab.TODAY,
       }));
     } catch (e) {
       // TODO - handle error
@@ -331,7 +351,7 @@ const useStore = create<StoreState>()((set, get) => ({
   setMonth: (month) => {
     set({ month });
   },
-  setDisplayDate({ year, month, day}: DayDate) {
+  setDisplayDate({ year, month, day }: DayDate) {
     set({ year, month, day });
   },
 
@@ -359,10 +379,22 @@ const useStore = create<StoreState>()((set, get) => ({
     set(() => ({ showDayDataDialog: false, dayDataDialogProps: null })),
 
   showStarRatingDialog: false,
-  openShowStarRatingDialog: () => 
+  openShowStarRatingDialog: () =>
     set((state) => ({ showStarRatingDialog: true } as StoreState)),
-  closeShowStarRatingDialog: () => 
+  closeShowStarRatingDialog: () =>
     set((state) => ({ showStarRatingDialog: false } as StoreState)),
+
+  showConfirmLogoutDialog: false,
+  openConfirmLogoutDialog: () =>
+    set((state) => ({ showConfirmLogoutDialog: true } as StoreState)),
+  closeConfirmLogoutDialog: () =>
+    set((state) => ({ showConfirmLogoutDialog: false } as StoreState)),
+
+  showConfirmClearDataDialog: false,
+  openConfirmClearDataDialog: () =>
+    set((state) => ({ showConfirmClearDataDialog: true } as StoreState)),
+  closeConfirmClearDataDialog: () =>
+    set((state) => ({ showConfirmClearDataDialog: false } as StoreState)),
 }));
 
 export default useStore;
