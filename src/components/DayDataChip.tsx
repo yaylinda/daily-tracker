@@ -10,10 +10,12 @@ const DayDataChip = ({
   lifeVariable,
   tooltipPlacement,
   isToday,
+  allowEditPrevDay,
 }: {
   lifeVariable: LifeVariable;
   tooltipPlacement: "left" | "right";
   isToday: boolean;
+  allowEditPrevDay: boolean;
 }) => {
   const [saving, setSaving] = useState<boolean>(false);
 
@@ -45,7 +47,7 @@ const DayDataChip = ({
   return (
     <Tooltip
       title={
-        isToday
+        isToday || allowEditPrevDay
           ? saving
             ? "Saving..."
             : isTrue
@@ -88,8 +90,8 @@ const DayDataChip = ({
         }
         label={lifeVariable.label}
         variant={isTrue ? undefined : "outlined"}
-        onClick={() => (isToday ? updateData() : undefined)}
-        clickable={isToday}
+        onClick={() => (isToday || allowEditPrevDay ? updateData() : undefined)}
+        clickable={isToday || allowEditPrevDay}
       />
     </Tooltip>
   );

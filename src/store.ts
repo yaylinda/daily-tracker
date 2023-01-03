@@ -23,7 +23,8 @@ import {
   YearDataMap,
 } from "./types";
 import { LOCAL_STORAGE_KEYS } from "./utils/constants";
-import { getDateKey } from "./utils/dateUtil";
+import { getDateKey, getDayDateFromMoment } from "./utils/dateUtil";
+
 
 enableMapSet();
 interface StoreState {
@@ -174,7 +175,6 @@ const useStore = create<StoreState>()((set, get) => ({
   },
   deleteLifeVariable: async (lifeVariableId: string) => {
     await deleteLifeVariable(get().user!.uid, lifeVariableId);
-    // TODO - update state.lifeVariables
   },
 
   addDayData: async (

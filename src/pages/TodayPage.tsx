@@ -13,17 +13,18 @@ import {
   Chip,
   IconButton,
   Stack,
+  Switch,
   Tooltip,
   Typography,
   Zoom,
 } from "@mui/material";
 import { chunk, isEmpty } from "lodash";
 import moment from "moment";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import DayDataChip from "../components/DayDataChip";
 import useStore from "../store";
 import theme from "../theme";
-import { LifeVariable } from "../types";
+import { DayDate, LifeVariable } from "../types";
 import {
   getDateKey,
   getDayDateFromMoment,
@@ -31,6 +32,7 @@ import {
   isToday,
   isYesterday,
 } from "../utils/dateUtil";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const NUM_CHIPS_PER_ROW = 2;
 
@@ -68,6 +70,8 @@ const TodayPage = () => {
     openAddLifeVariableDialog,
     setDisplayDate,
   } = useStore();
+
+  const [allowEditPrevDay, setAllowEditPrevDay] = useState(false);
 
   // Number of variables that got marked as completed on this day
   const numCompleted = useMemo(() => {
@@ -111,118 +115,129 @@ const TodayPage = () => {
         maxWidth: 500,
         margin: "auto",
         height: "100%",
+        overflow: "hidden",
+        "&::-webkit-scrollbar": {
+          background: "transparent",
+          display: "none",
+          width: 0,
+          height: 0,
+        },
       }}
     >
-      <Box sx={{ display: "flex", marginTop: "auto", marginBottom: "auto" }}>
-        <Card variant="outlined" sx={{ width: "100%" }}>
-          <CardHeader
-            sx={{ color: theme.palette.text.primary }}
-            avatar={
-              <Avatar
-                sx={{
-                  backgroundColor: theme.palette.background.paper,
-                  border: `2px ${theme.palette.text.primary} solid`,
-                }}
-              >
-                <Typography
-                  variant="h6"
-                  sx={{ color: theme.palette.text.primary }}
-                >
-                  {day}
-                </Typography>
-              </Avatar>
-            }
-            title={currentDayLabel()}
-            subheader={`Completed: ${numCompleted} out of ${lifeVariablesToShow.length}`}
-          />
-          <CardContent
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 2,
-            }}
-          >
-            {isEmpty(lifeVariablesToShow) && !isToday({ year, month, day }) && (
-              <Typography
-                variant="caption"
-                sx={{
-                  textAlign: "center",
-                  color: theme.palette.text.secondary,
-                }}
-              >
-                No data
-              </Typography>
-            )}
-            {chunk([...lifeVariablesToShow, {}], NUM_CHIPS_PER_ROW).map(
-              (chips, row_num) => (
-                <Box
-                  key={`row_${row_num}`}
-                  sx={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    gap: 2,
-                  }}
-                >
-                  {chips.map((lifeVariable, index) =>
-                    isEmpty(lifeVariable) ? (
-                      isToday({ year, month, day }) && (
-                        <AddLifeVariableChip key={`add_chip`} />
-                      )
-                    ) : (
-                      <DayDataChip
-                        key={`chip_${(lifeVariable as LifeVariable).id}`}
-                        lifeVariable={lifeVariable as LifeVariable}
-                        tooltipPlacement={index ? "right" : "left"}
-                        isToday={isToday({ year, month, day })}
-                      />
-                    )
-                  )}
-                </Box>
-              )
-            )}
-          </CardContent>
-          <CardActions
-            sx={{ display: "flex", justifyContent: "space-between" }}
-          >
-            <Tooltip
-              title={`Go to ${prevDay().format("ll")}`}
-              TransitionComponent={Zoom}
-              arrow
+      <Card sx={{ width: "100%", display: "flex", flexDirection: "column" }}>
+        <CardHeader
+          sx={{ color: theme.palette.text.primary }}
+          avatar={
+            <Avatar
+              sx={{
+                backgroundColor: theme.palette.background.paper,
+                border: `2px ${theme.palette.text.primary} solid`,
+              }}
             >
-              <IconButton
-                onClick={() => setDisplayDate(getDayDateFromMoment(prevDay()))}
+              <Typography
+                variant="h6"
+                sx={{ color: theme.palette.text.primary }}
               >
-                <ChevronLeftIcon />
+                {day}
+              </Typography>
+            </Avatar>
+          }
+          title={currentDayLabel()}
+          subheader={`Completed: ${numCompleted} out of ${lifeVariablesToShow.length}`}
+          action={
+            isToday({ year, month, day }) ? undefined : (
+              <Switch
+                checked={allowEditPrevDay}
+                onChange={() => setAllowEditPrevDay(!allowEditPrevDay)}
+              />
+            )
+          }
+        />
+        <CardContent
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
+            overflowY: "scroll",
+          }}
+        >
+          {isEmpty(lifeVariablesToShow) && !isToday({ year, month, day }) && (
+            <Typography
+              variant="caption"
+              sx={{
+                textAlign: "center",
+                color: theme.palette.text.secondary,
+              }}
+            >
+              No data
+            </Typography>
+          )}
+          {chunk([...lifeVariablesToShow, {}], NUM_CHIPS_PER_ROW).map(
+            (chips, row_num) => (
+              <Box
+                key={`row_${row_num}`}
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "space-between",
+                  gap: 2,
+                }}
+              >
+                {chips.map((lifeVariable, index) =>
+                  isEmpty(lifeVariable) ? (
+                    isToday({ year, month, day }) && (
+                      <AddLifeVariableChip key={`add_chip`} />
+                    )
+                  ) : (
+                    <DayDataChip
+                      key={`chip_${(lifeVariable as LifeVariable).id}`}
+                      lifeVariable={lifeVariable as LifeVariable}
+                      tooltipPlacement={index ? "right" : "left"}
+                      isToday={isToday({ year, month, day })}
+                      allowEditPrevDay={allowEditPrevDay}
+                    />
+                  )
+                )}
+              </Box>
+            )
+          )}
+        </CardContent>
+        <CardActions sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Tooltip
+            title={`Go to ${prevDay().format("ll")}`}
+            TransitionComponent={Zoom}
+            arrow
+          >
+            <IconButton
+              disabled={month === 0 && day === 1}
+              onClick={() => setDisplayDate(getDayDateFromMoment(prevDay()))}
+            >
+              <ChevronLeftIcon />
+            </IconButton>
+          </Tooltip>
+          {!isToday({ year, month, day }) && (
+            <Tooltip title="Go to Today" TransitionComponent={Zoom} arrow>
+              <IconButton
+                onClick={() => setDisplayDate(getDayDateFromMoment(moment()))}
+              >
+                <TodayIcon />
               </IconButton>
             </Tooltip>
-            {!isToday({ year, month, day }) && (
-              <Tooltip title="Go to Today" TransitionComponent={Zoom} arrow>
-                <IconButton
-                  onClick={() => setDisplayDate(getDayDateFromMoment(moment()))}
-                >
-                  <TodayIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-            {!isToday({ year, month, day }) && (
-              <Tooltip
-                title={`Go to ${nextDay().format("ll")}`}
-                TransitionComponent={Zoom}
-                arrow
-              >
-                <IconButton
-                  onClick={() =>
-                    setDisplayDate(getDayDateFromMoment(nextDay()))
-                  }
-                >
-                  <ChevronRightIcon />
-                </IconButton>
-              </Tooltip>
-            )}
-          </CardActions>
-        </Card>
-      </Box>
+          )}
+          <Tooltip
+            title={`Go to ${nextDay().format("ll")}`}
+            TransitionComponent={Zoom}
+            arrow
+          >
+            <IconButton
+              disabled={isToday({ year, month, day })}
+              onClick={() => setDisplayDate(getDayDateFromMoment(nextDay()))}
+            >
+              <ChevronRightIcon />
+            </IconButton>
+          </Tooltip>
+        </CardActions>
+      </Card>
     </Stack>
   );
 };
