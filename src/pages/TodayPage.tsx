@@ -4,9 +4,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TodayIcon from "@mui/icons-material/Today";
 import {
   Avatar,
-  Box,
-  Button,
-  Card,
+  Box, Card,
   CardActions,
   CardContent,
   CardHeader,
@@ -16,7 +14,7 @@ import {
   Switch,
   Tooltip,
   Typography,
-  Zoom,
+  Zoom
 } from "@mui/material";
 import { chunk, isEmpty } from "lodash";
 import moment from "moment";
@@ -24,15 +22,14 @@ import { useMemo, useState } from "react";
 import DayDataChip from "../components/DayDataChip";
 import useStore from "../store";
 import theme from "../theme";
-import { DayDate, LifeVariable } from "../types";
+import { LifeVariable } from "../types";
 import {
   getDateKey,
   getDayDateFromMoment,
   getMomentFromDayDate,
   isToday,
-  isYesterday,
+  isYesterday
 } from "../utils/dateUtil";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 const NUM_CHIPS_PER_ROW = 2;
 
