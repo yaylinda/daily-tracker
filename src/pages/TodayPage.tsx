@@ -100,10 +100,10 @@ const TodayPage = () => {
 
   const currentDayLabel = () =>
     isToday({ year, month, day })
-      ? "Today"
+      ? `Today (${getMomentFromDayDate({ year, month, day }).format('ddd')})`
       : isYesterday({ year, month, day })
-      ? "Yesterday"
-      : getMomentFromDayDate({ year, month, day }).format("LL");
+      ? `Yesterday (${getMomentFromDayDate({ year, month, day }).format('ddd')})`
+      : getMomentFromDayDate({ year, month, day }).format("ddd, LL");
 
   return (
     <Stack
